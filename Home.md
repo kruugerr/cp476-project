@@ -24,6 +24,6 @@
 - Defined 10 core user stories covering student and teacher flows
 
 **Decisions Made:**
-- [o] Confirm project scope
-- [x] Confirm who is doing what work
-- [x] Confirm tech stack
+- [x] Confirm project scope
+- [ ] Confirm who is doing what work
+- [ ] Confirm tech stack
