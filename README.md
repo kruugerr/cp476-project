@@ -71,7 +71,7 @@ cp476-project/
 | Name | GitHub |
 |------|--------|
 | Zach Gould| @kruugerr |
-| | |
+| Zohra Haidary| @HZohra |
 | | |
 
 ---
