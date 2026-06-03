@@ -1,15 +1,25 @@
 # cp476-project — Project Wiki
 
 ## Overview
-**Project:** Student School Management App  
-**Course:** CP476  
+**Project:** Student School Management App - Trackr
+**Course:** CP476 - Internet Computing (Spring 2026) 
 **Repo:** [cp476-project](https://github.com/kruugerr/cp476-project)  
 **Status:** In Progress
 
 ---
 
 ---
+**Task Assignments (Milestone 1):**
+- Project Lead & GitHub/Repo: Zach — repo setup, README, Kanban
+- Project Proposal: Zach & Ferzan — problem statement, scope, feature list
+- Requirements / User Stories: Tyler & Win
+- Wireframes & Navigation Map: Zohra & Ali
+- Data Planning: Rafae & Thanh
 
+## Definition of Done
+A task is done when it is completed, reviewed by a teammate, tested where applicable, documented, and merged to main.
+
+----------------------------------------------------
 ## Meeting Minutes
 - 1 hour (10:30 - 11:30)
 
