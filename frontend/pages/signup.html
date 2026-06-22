@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create account · Trackr</title>
 
+  <script type="module" src="../js/pages/signup.js"></script>
   <script>
     try { document.documentElement.dataset.theme = localStorage.getItem("trackr-theme") || "light"; }
     catch (e) { document.documentElement.dataset.theme = "light"; }
@@ -17,11 +18,12 @@
   <link rel="stylesheet" href="../css/components.css" />
   <link rel="stylesheet" href="../css/styles.css" />
 </head>
+
 <body>
   <main class="auth">
     <a class="auth-brand" href="../index.html" aria-label="Trackr home">
-        <img src="../assets/logo.png" alt="Trackr logo"/>
-        <span class="brand-name">Trackr</span>
+      <img src="../assets/logo.png" alt="Trackr logo" />
+      <span class="brand-name">Trackr</span>
     </a>
 
     <section class="auth-card" aria-labelledby="auth-title">
@@ -42,21 +44,16 @@
       <form class="auth-form" novalidate>
         <div class="field">
           <label class="field-label" for="email">Email</label>
-          <input class="input" type="email" id="email" name="email"autocomplete="email" placeholder="user@university.ca" required />
+          <input class="input" type="email" id="email" name="email"
+                 autocomplete="email" placeholder="user@university.ca" required />
           <p class="field-error" data-error-for="email" role="alert"></p>
         </div>
 
         <div class="field">
-            <label class="field-label" for="password">Password</label>
-            <input class="input" type="password" id="password" name="password" autocomplete="new-password" required />
-          
-            <ul class="password-rules">
-                <li>At least 8 characters</li>
-                <li>At least one number</li>
-                <li>At least one uppercase letter</li>
-                <li>Must match your password above</li>
-            </ul>
-            <p class="field-error" data-error-for="confirm-password" role="alert"></p>
+          <label class="field-label" for="password">Password</label>
+          <input class="input" type="password" id="password" name="password"
+                 autocomplete="new-password" required />
+          <p class="field-error" data-error-for="password" role="alert"></p>
         </div>
 
         <div class="field">
@@ -66,19 +63,28 @@
           <p class="field-error" data-error-for="confirm-password" role="alert"></p>
         </div>
 
+        <!-- shared password checklist: JS adds .met as each rule passes -->
+        <div class="password-rules">
+          <p class="password-rules-title">Password requirements</p>
+          <ul class="rule-list" aria-live="polite">
+            <li class="rule" data-rule="length"><span class="rule-mark" aria-hidden="true"></span>At least 8 characters</li>
+            <li class="rule" data-rule="uppercase"><span class="rule-mark" aria-hidden="true"></span>One uppercase letter</li>
+            <li class="rule" data-rule="number"><span class="rule-mark" aria-hidden="true"></span>One number</li>
+            <li class="rule" data-rule="special"><span class="rule-mark" aria-hidden="true"></span>One special character</li>
+          </ul>
+        </div>
+
         <!-- US-01: user must choose Student or Admin -->
         <fieldset class="role-select">
-            <legend class="field-label">I'm signing up as</legend>
-
-            <label class="role-option">
-                <input type="radio" name="role" value="student" checked />
-                <span>Student</span>
-            </label>
-
-            <label class="role-option">
-                <input type="radio" name="role" value="admin" />
-                <span>Admin</span>
-            </label>
+          <legend class="field-label">I'm signing up as</legend>
+          <label class="role-option">
+            <input type="radio" name="role" value="student" checked />
+            <span>Student</span>
+          </label>
+          <label class="role-option">
+            <input type="radio" name="role" value="admin" />
+            <span>Admin</span>
+          </label>
         </fieldset>
 
         <button type="submit" class="btn btn-primary btn-block">Create account</button>
@@ -89,7 +95,5 @@
       </p>
     </section>
   </main>
-
-  <!-- <script type="module" src="../js/pages/signup.js"></script> -->
 </body>
 </html>
