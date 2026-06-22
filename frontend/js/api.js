@@ -1,0 +1,1 @@
+/*Async functions returning mock data. Backend team swaps the bodies for real calls later.*/
