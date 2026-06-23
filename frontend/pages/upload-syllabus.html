@@ -4,24 +4,38 @@
     <title>Upload Syllabus</title>
     <link rel="stylesheet" href="../css/syllabus.css">
 </head>
-
 <body>
 
-    <h1>Upload Syllabus</h1>
+    <div class="container">
 
-    <p>Select a syllabus PDF file.</p>
+        <div class="sidebar">
+            <h2>Trackr</h2>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="gpa-tracker.html">GPA Tracker</a>
+            <a class="active" href="upload-syllabus.html">Upload Syllabus</a>
+            <a href="settings.html">Settings</a>
+        </div>
 
-    <input type="file" id="pdfFile">
+        <div class="main">
+            <h1>Add a New Course</h1>
+            <p>Upload your syllabus PDF. The system will extract course and assignment information.</p>
 
-    <br>
+            <div class="card">
+                <h2>Upload PDF</h2>
 
-    <button id="uploadBtn">
-        Extract With AI
-    </button>
+                <input type="file" id="pdfFile" accept="application/pdf">
 
-    <p id="message"></p>
+                <p id="fileMessage"></p>
+
+                <button id="extractBtn">Extract With AI</button>
+            </div>
+        </div>
+
+    </div>
 
     <script src="../js/upload-syllabus.js"></script>
-
 </body>
 </html>
