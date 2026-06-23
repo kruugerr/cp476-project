@@ -1,0 +1,477 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f7f2f2;
+    color: #111;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 230px;
+    background-color: #111;
+    color: white;
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-circle {
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    color: black;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+}
+
+.logo h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.collapse {
+    margin-left: auto;
+}
+
+.semester-card {
+    background-color: #242424;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 25px 0;
+}
+
+.semester-card small {
+    color: #aaa;
+    font-size: 11px;
+}
+
+.semester-card p {
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 11px;
+    margin-bottom: 7px;
+    border-radius: 8px;
+    display: block;
+    font-size: 15px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #555;
+}
+
+.user-box {
+    margin-top: auto;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.user-circle {
+    width: 32px;
+    height: 32px;
+    background-color: white;
+    color: black;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-weight: bold;
+}
+
+.user-box p {
+    margin: 0;
+}
+
+.user-box small {
+    color: #ccc;
+}
+
+.main {
+    flex: 1;
+}
+
+.topbar {
+    height: 60px;
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 25px;
+}
+
+.topbar input {
+    margin-left: auto;
+    width: 370px;
+    padding: 9px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.page {
+    padding: 25px;
+}
+
+.page h1 {
+    margin-bottom: 5px;
+}
+
+.subtext {
+    color: #666;
+    margin-top: 0;
+}
+
+.steps {
+    display: flex;
+    gap: 25px;
+    margin: 25px 0;
+    font-size: 13px;
+}
+
+.steps span {
+    color: #777;
+}
+
+.steps .active-step {
+    color: black;
+    font-weight: bold;
+}
+
+.steps .done-step {
+    color: black;
+}
+
+/* Upload page */
+.upload-box {
+    width: 680px;
+    height: 320px;
+    background-color: white;
+    border: 2px dashed #bbb;
+    border-radius: 14px;
+    text-align: center;
+    padding-top: 70px;
+}
+
+.upload-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #eee;
+    border-radius: 12px;
+    margin: auto;
+    line-height: 60px;
+    font-size: 30px;
+}
+
+.browse-btn {
+    display: inline-block;
+    background-color: #111;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.browse-btn input {
+    display: none;
+}
+
+.bottom-buttons {
+    width: 680px;
+    margin-top: 22px;
+    display: flex;
+    justify-content: space-between;
+}
+
+button,
+.cancel-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button {
+    background-color: #111;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #ddd;
+    color: black;
+}
+
+/* Loading */
+.loading-card {
+    width: 720px;
+    background-color: white;
+    border-radius: 14px;
+    padding: 55px;
+    text-align: center;
+    box-shadow: 0 2px 8px #ccc;
+}
+
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 5px solid #ddd;
+    border-top: 5px solid black;
+    border-radius: 50%;
+    margin: auto;
+    animation: spin 1s linear infinite;
+}
+
+.progress {
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 20px;
+    margin-top: 30px;
+}
+
+.progress-fill {
+    height: 10px;
+    background-color: black;
+    border-radius: 20px;
+    animation: load 2.5s linear;
+}
+
+.hide {
+    display: none;
+}
+
+/* Course page */
+.course-top {
+    background-color: white;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 16px;
+}
+
+.course-title-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.current-grade {
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.course-progress-bg {
+    height: 13px;
+    background-color: #ddd;
+    border-radius: 20px;
+    margin-top: 12px;
+}
+
+.course-progress-fill {
+    height: 13px;
+    width: 87%;
+    background-color: green;
+    border-radius: 20px;
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 16px;
+}
+
+.card {
+    background-color: white;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.warning {
+    background-color: yellow;
+    padding: 10px;
+    margin-top: 12px;
+}
+
+.assignment-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.assignment-table th,
+.assignment-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.status {
+    padding: 5px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.overdue {
+    background-color: #ffd6d6;
+    color: red;
+}
+
+.in-progress {
+    background-color: #fff0b8;
+    color: #8a6500;
+}
+
+.not-started {
+    background-color: #eee;
+}
+
+.graded {
+    background-color: #d7f5df;
+    color: green;
+}
+
+/* Assignment page */
+.filters {
+    background-color: white;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.filters input,
+.filters select {
+    padding: 8px;
+}
+
+.tabs {
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    width: 300px;
+    margin-bottom: 18px;
+}
+
+.tabs button {
+    background-color: #eee;
+    color: black;
+}
+
+.assignment-card {
+    background-color: white;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.tag {
+    background-color: #e8f1ff;
+    padding: 5px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.assignment-status {
+    float: right;
+    padding: 5px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.missing {
+    background-color: #ffdede;
+    color: red;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* Extraction review */
+.review-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+}
+
+.info-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.info-card h3 span {
+    background-color: #d6f3df;
+    color: green;
+    border-radius: 8px;
+    font-size: 11px;
+    padding: 4px 8px;
+}
+
+label {
+    display: block;
+    margin-top: 9px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+input,
+textarea,
+select {
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.info-card input,
+.info-card textarea,
+.info-card select {
+    width: 95%;
+    border: none;
+    background-color: #f1eeee;
+    border-radius: 7px;
+}
+
+.assignment-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.wide-card {
+    grid-column: span 2;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes load {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}
