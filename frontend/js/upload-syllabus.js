@@ -1,20 +1,17 @@
-let uploadBtn = document.getElementById("uploadBtn");
 let pdfFile = document.getElementById("pdfFile");
-let message = document.getElementById("message");
+let extractBtn = document.getElementById("extractBtn");
+let fileMessage = document.getElementById("fileMessage");
 
-uploadBtn.addEventListener("click", function () {
-
-    if (pdfFile.files.length == 0) {
-        alert("Please select a PDF file");
+extractBtn.addEventListener("click", function () {
+    if (pdfFile.files.length === 0) {
+        alert("Please choose a PDF file first.");
         return;
     }
 
     let fileName = pdfFile.files[0].name;
+    fileMessage.innerHTML = "Selected file: " + fileName;
 
-    message.innerHTML = "File Selected: " + fileName;
+    alert("AI extraction started.");
 
-    setTimeout(function () {
-        window.location.href = "extraction-review.html";
-    }, 2000);
-
+    window.location.href = "extraction-review.html";
 });
