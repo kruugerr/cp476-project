@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extraction Review</title>
+    <link rel="stylesheet" href="../css/syllabus.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+            <h2>Trackr</h2>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="gpa-tracker.html">GPA Tracker</a>
+            <a class="active" href="upload-syllabus.html">Upload Syllabus</a>
+            <a href="settings.html">Settings</a>
+        </div>
+
+        <div class="main">
+            <h1>Review Extracted Information</h1>
+            <p>Check the extracted course details before saving.</p>
+
+            <div class="card">
+                <h2>Course Details</h2>
+
+                <label>Course Code</label>
+                <input type="text" id="courseCode" value="CP476">
+
+                <label>Course Name</label>
+                <input type="text" id="courseName" value="Internet Computing">
+
+                <label>Professor</label>
+                <input type="text" id="professor" value="Dr. Karim">
+
+                <label>Semester</label>
+                <input type="text" id="semester" value="Spring 2026">
+            </div>
+
+            <div class="card">
+                <h2>Assignments</h2>
+
+                <div id="assignmentList"></div>
+
+                <button id="addAssignmentBtn">Add Assignment</button>
+            </div>
+
+            <button id="saveBtn">Save Course</button>
+        </div>
+
+    </div>
+
+    <script src="../js/extraction-review.js"></script>
+</body>
+</html>
