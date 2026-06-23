@@ -1,0 +1,139 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course View</title>
+    <link rel="stylesheet" href="../css/course.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <h2>Trackr</h2>
+
+        <p>Spring 2026 - Week 11</p>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="assignments.html">Assignments</a>
+        <a href="calendar.html">Calendar</a>
+        <a href="gpa-tracker.html">GPA Tracker</a>
+        <a href="upload-syllabus.html">Upload Syllabus</a>
+        <a href="settings.html">Settings</a>
+    </div>
+
+    <div class="main">
+
+        <h1>Introduction to Algorithms</h1>
+
+        <div class="course-card">
+
+            <h2>Current Grade: <span id="grade">87%</span></h2>
+
+            <div class="progress">
+                <div class="progress-bar" id="bar"></div>
+            </div>
+
+            <p>Professor: Dr. Sarah Kim</p>
+            <p>Office Hours: Monday and Wednesday 2PM - 4PM</p>
+            <p>Textbook: Introduction to Algorithms</p>
+
+        </div>
+
+        <div class="grade-breakdown">
+
+            <h2>Grade Breakdown</h2>
+
+            <p>Assignments: 30%</p>
+            <p>Labs: 15%</p>
+            <p>Quizzes: 15%</p>
+            <p>Midterm: 20%</p>
+            <p>Final Exam: 20%</p>
+
+            <button onclick="updateGrade()">
+                Update Grade
+            </button>
+
+        </div>
+
+        <div class="assignment-section">
+
+            <h2>Assignments</h2>
+
+            <table>
+
+                <tr>
+                    <th>Assignment</th>
+                    <th>Type</th>
+                    <th>Due Date</th>
+                    <th>Weight</th>
+                    <th>Status</th>
+                </tr>
+
+                <tr>
+                    <td>
+                        <a href="assignment-view.html">
+                            Assignment 1 - Sorting Algorithms
+                        </a>
+                    </td>
+                    <td>Assignment</td>
+                    <td>Nov 14, 2026</td>
+                    <td>6%</td>
+                    <td>Overdue</td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <a href="assignment-view.html">
+                            Assignment 2 - Graph Traversal
+                        </a>
+                    </td>
+                    <td>Assignment</td>
+                    <td>Dec 2, 2026</td>
+                    <td>7%</td>
+                    <td>In Progress</td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <a href="assignment-view.html">
+                            Assignment 3 - Dynamic Programming
+                        </a>
+                    </td>
+                    <td>Assignment</td>
+                    <td>Dec 13, 2026</td>
+                    <td>7%</td>
+                    <td>Not Started</td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <a href="assignment-view.html">
+                            Midterm Exam
+                        </a>
+                    </td>
+                    <td>Exam</td>
+                    <td>Feb 27, 2026</td>
+                    <td>20%</td>
+                    <td>Graded</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+        <div class="warning">
+            Warning: Missing course data will appear here.
+        </div>
+
+    </div>
+
+</div>
+
+<script src="../js/course.js"></script>
+
+</body>
+</html>
+```
