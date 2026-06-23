@@ -2,34 +2,34 @@
 <html>
 <head>
     <title>Extraction Review</title>
-    <link rel="stylesheet" href="../css/syllabus.css">
+    <link rel="stylesheet" href="../css/app-pages.css">
 </head>
 <body>
 
-<div class="layout">
+<div class="container">
 
     <div class="sidebar">
         <div class="logo">
-            <span class="circle">T</span>
+            <div class="logo-circle">T</div>
             <h2>Trackr</h2>
-            <span class="collapse">≪</span>
+            <span class="collapse">&lt;&lt;</span>
         </div>
 
-        <div class="semester">
+        <div class="semester-card">
             <small>SEMESTER</small>
             <p>Spring 2026 - Week 11</p>
         </div>
 
-        <a href="dashboard.html">⌂ Dashboard</a>
-        <a href="courses.html">▣ Courses</a>
-        <a href="assignments.html">✎ Assignment</a>
-        <a href="calendar.html">▣ Calendar</a>
-        <a href="gpa-tracker.html">⌁ GPA Tracker</a>
-        <a class="active" href="upload-syllabus.html">▰ Upload Syllabus</a>
-        <a href="settings.html">⚙ Settings</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="assignment-view.html">Assignment</a>
+        <a href="calendar.html">Calendar</a>
+        <a href="gpa-tracker.html">GPA Tracker</a>
+        <a class="active" href="upload-syllabus.html">Upload Syllabus</a>
+        <a href="settings.html">Settings</a>
 
-        <div class="user">
-            <span class="user-icon">◉</span>
+        <div class="user-box">
+            <div class="user-circle">A</div>
             <div>
                 <p>Alex Chen</p>
                 <small>Year 3</small>
@@ -38,9 +38,7 @@
     </div>
 
     <div class="main">
-
         <div class="topbar">
-            <span class="menu">☰</span>
             <span>Settings</span>
             <input type="text" placeholder="Search courses, assignments...">
             <span>⌕</span>
@@ -50,9 +48,7 @@
 
         <div class="page" id="loadingSection">
             <h1>Add a new course</h1>
-            <p class="subtext">
-                Upload your syllabus PDF and our AI will extract all the important details for you
-            </p>
+            <p class="subtext">AI is extracting the syllabus information.</p>
 
             <div class="steps">
                 <span class="done-step">✓ Upload PDF</span>
@@ -76,9 +72,7 @@
 
         <div class="page hide" id="reviewSection">
             <h1>Add a new course</h1>
-            <p class="subtext">
-                Upload your syllabus PDF and our AI will extract all the important details for you
-            </p>
+            <p class="subtext">Review all extracted fields before confirming.</p>
 
             <div class="steps">
                 <span class="done-step">✓ Upload PDF</span>
@@ -88,158 +82,86 @@
             </div>
 
             <div class="review-grid">
-
                 <div class="info-card">
                     <h3>COURSE INFO <span>High confidence</span></h3>
-
-                    <label>COURSE CODE</label>
-                    <input type="text" value="CP476">
-
-                    <label>COURSE NAME</label>
-                    <input type="text" value="Internet Computing">
-
-                    <label>CREDITS</label>
-                    <input type="text" value="0.5">
-
-                    <label>SECTION</label>
-                    <input type="text" value="B">
-
-                    <label>SEMESTER</label>
-                    <input type="text" value="Spring 2026">
-
-                    <label>PROFESSOR</label>
-                    <input type="text" value="Dr. Karim">
+                    <label>Course Code</label>
+                    <input value="CP476">
+                    <label>Course Name</label>
+                    <input value="Internet Computing">
+                    <label>Credits</label>
+                    <input value="0.5">
+                    <label>Professor</label>
+                    <input value="Dr. Karim">
                 </div>
 
                 <div class="info-card">
                     <h3>COURSE DETAILS <span>High confidence</span></h3>
-
-                    <label>LEVEL</label>
-                    <input type="text" value="Undergraduate">
-
-                    <label>DESCRIPTION</label>
+                    <label>Level</label>
+                    <input value="Undergraduate">
+                    <label>Description</label>
                     <textarea>Introduction to Internet Computing concepts and technology.</textarea>
-
-                    <label>LOCATION</label>
-                    <input type="text" value="Main Campus">
-
-                    <label>MEETING TIME</label>
-                    <input type="text" value="Mon/Wed 2:00 - 4:00 pm">
+                    <label>Meeting Time</label>
+                    <input value="Mon/Wed 2:00 - 4:00 pm">
                 </div>
 
                 <div class="info-card">
                     <h3>KEY DATES <span>High confidence</span></h3>
-
-                    <label>SEMESTER START</label>
+                    <label>Semester Start</label>
                     <input type="date" value="2026-01-05">
-
-                    <label>SEMESTER END</label>
+                    <label>Semester End</label>
                     <input type="date" value="2026-04-18">
-
-                    <label>ADD/DROP DEADLINE</label>
-                    <input type="date" value="2026-01-20">
-
-                    <label>WITHDRAWAL DEADLINE</label>
-                    <input type="date" value="2026-03-20">
-
-                    <label>EXAM PERIOD</label>
-                    <input type="text" value="Apr 21 - Apr 26">
+                    <label>Final Exam</label>
+                    <input value="Apr 21 - Apr 26">
                 </div>
 
                 <div class="info-card">
                     <h3>GRADE WEIGHT</h3>
-
                     <label>Assignments</label>
-                    <input type="text" value="30%">
-
+                    <input value="30%">
                     <label>Labs</label>
-                    <input type="text" value="15%">
-
+                    <input value="15%">
                     <label>Quizzes</label>
-                    <input type="text" value="15%">
-
+                    <input value="15%">
                     <label>Midterm</label>
-                    <input type="text" value="20%">
-
+                    <input value="20%">
                     <label>Final Exam</label>
-                    <input type="text" value="20%">
-
-                    <label>Total</label>
-                    <input type="text" value="100%">
+                    <input value="20%">
                 </div>
 
-                <div class="info-card assignment-card">
+                <div class="info-card wide-card">
                     <h3>ASSIGNMENTS & DELIVERABLES <span>High confidence</span></h3>
-
-                    <div class="table-head">
-                        <p>ASSIGNMENT NAME</p>
-                        <p>TYPE</p>
-                        <p>DUE DATE</p>
-                        <p>WEIGHT</p>
-                        <p>STATUS</p>
-                    </div>
 
                     <div id="assignmentBox">
                         <div class="assignment-row">
-                            <input type="text" value="Milestone 01">
-                            <input type="text" value="Milestone">
+                            <input value="Milestone 01">
                             <input type="date" value="2026-02-01">
-                            <input type="text" value="5%">
+                            <input value="5%">
                             <select>
                                 <option>Not Started</option>
                                 <option>In Progress</option>
-                                <option>Completed</option>
                             </select>
                         </div>
 
                         <div class="assignment-row">
-                            <input type="text" value="Milestone 02">
-                            <input type="text" value="Milestone">
+                            <input value="Milestone 02">
                             <input type="date" value="2026-03-01">
-                            <input type="text" value="10%">
+                            <input value="10%">
                             <select>
                                 <option>Not Started</option>
                                 <option>In Progress</option>
-                                <option>Completed</option>
-                            </select>
-                        </div>
-
-                        <div class="assignment-row">
-                            <input type="text" value="Final Project">
-                            <input type="text" value="Project">
-                            <input type="date" value="2026-04-10">
-                            <input type="text" value="25%">
-                            <select>
-                                <option>Not Started</option>
-                                <option>In Progress</option>
-                                <option>Completed</option>
-                            </select>
-                        </div>
-
-                        <div class="assignment-row">
-                            <input type="text" value="Final Exam">
-                            <input type="text" value="Exam">
-                            <input type="date" value="2026-04-20">
-                            <input type="text" value="20%">
-                            <select>
-                                <option>Not Started</option>
-                                <option>In Progress</option>
-                                <option>Completed</option>
                             </select>
                         </div>
                     </div>
 
-                    <button id="addBtn" class="add-btn">+ Add assignment</button>
+                    <button id="addBtn">+ Add assignment</button>
                 </div>
-
             </div>
 
-            <div class="bottom-buttons review-buttons">
-                <a href="upload-syllabus.html" class="cancel-btn">← Back</a>
+            <div class="bottom-buttons">
+                <a href="upload-syllabus.html" class="cancel-btn">Back</a>
                 <button id="saveBtn">Confirm & add course</button>
             </div>
         </div>
-
     </div>
 
 </div>
