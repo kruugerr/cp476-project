@@ -1,10 +1,10 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f6f1f1;
+    background-color: #f7f1f1;
 }
 
-.container {
+.layout {
     display: flex;
     min-height: 100vh;
 }
@@ -16,12 +16,23 @@ body {
     padding: 20px;
 }
 
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.semester {
+    background-color: #222;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
 .sidebar a {
     display: block;
     color: white;
     text-decoration: none;
     padding: 10px;
-    margin-bottom: 8px;
+    margin-top: 8px;
     border-radius: 6px;
 }
 
@@ -35,36 +46,132 @@ body {
     padding: 30px;
 }
 
-.card {
+.topbar {
     background-color: white;
-    padding: 25px;
-    margin-top: 20px;
-    border-radius: 10px;
-    max-width: 700px;
+    padding: 15px;
+    margin: -30px -30px 30px -30px;
+    display: flex;
+    justify-content: space-between;
 }
 
-input {
-    display: block;
-    width: 90%;
-    padding: 10px;
-    margin: 8px 0 18px 0;
+.topbar input {
+    width: 300px;
+    padding: 8px;
+}
+
+.steps {
+    margin: 25px 0;
+}
+
+.steps span {
+    margin-right: 20px;
+    color: gray;
+}
+
+.active-step {
+    color: black !important;
+    font-weight: bold;
+}
+
+.upload-box,
+.card,
+.loading-box {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 600px;
+    margin-bottom: 20px;
+}
+
+.upload-box {
+    border: 2px dashed #bbb;
+    text-align: center;
+    padding: 60px 25px;
+}
+
+.buttons {
+    width: 600px;
+    display: flex;
+    justify-content: space-between;
+}
+
+button,
+.cancel-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 button {
-    padding: 10px 16px;
     background-color: #111;
     color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
 }
 
-button:hover {
-    background-color: #333;
+.cancel-btn {
+    background-color: #ddd;
+    color: black;
 }
 
-.assignment-row {
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+input {
+    width: 90%;
+    padding: 9px;
+    margin-top: 5px;
+}
+
+.assignment {
     border: 1px solid #ddd;
     padding: 15px;
     margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.hide {
+    display: none;
+}
+
+.progress {
+    width: 100%;
+    height: 10px;
+    background-color: #ddd;
+    margin-top: 20px;
+}
+
+.progress-fill {
+    width: 100%;
+    height: 10px;
+    background-color: #111;
+}
+
+@media screen and (max-width: 800px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: auto;
+    }
+
+    .upload-box,
+    .card,
+    .loading-box,
+    .buttons {
+        width: auto;
+    }
+
+    .topbar {
+        display: block;
+    }
+
+    .topbar input {
+        width: 90%;
+    }
 }
