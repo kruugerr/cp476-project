@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assignment View</title>
+    <link rel="stylesheet" href="../css/assignment-view.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <h2>Trackr</h2>
+
+        <p class="semester">Spring 2026 - Week 11</p>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a class="active" href="assignment-view.html">Assignment</a>
+        <a href="calendar.html">Calendar</a>
+        <a href="gpa-tracker.html">GPA Tracker</a>
+        <a href="upload-syllabus.html">Upload Syllabus</a>
+        <a href="settings.html">Settings</a>
+
+        <div class="user">
+            Alex Chen<br>
+            <small>Year 3</small>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <div class="topbar">
+            <h3>Assignments</h3>
+            <input type="text" placeholder="Search courses, assignments...">
+            <span>🔔</span>
+            <span>👤</span>
+        </div>
+
+        <h1>All Assignments</h1>
+        <p>8 Total - 1 Overdue</p>
+
+        <div class="filters">
+            <input type="text" placeholder="Search assignments...">
+
+            <select>
+                <option>All Courses</option>
+                <option>CS301</option>
+                <option>CP476</option>
+            </select>
+
+            <select>
+                <option>All Status</option>
+                <option>Not Started</option>
+                <option>In Progress</option>
+                <option>Graded</option>
+            </select>
+
+            <button>Add new assignment</button>
+        </div>
+
+        <div class="tabs">
+            <button>Due</button>
+            <button>Priority</button>
+            <button>Weight</button>
+        </div>
+
+        <h4>Overdue</h4>
+
+        <div class="assignment-card">
+            <span class="tag">Assignment</span>
+            <span class="tag blue">CS301</span>
+            <span class="status overdue">Overdue</span>
+
+            <h3>Assignment 1 - Sorting Algorithms</h3>
+            <p>Due Nov 14, 2026 · 6% of final grade</p>
+
+            <p class="warning">
+                Missing assignment info — please review and update this entry.
+            </p>
+
+            <label>Status</label>
+            <select>
+                <option>Not Started</option>
+                <option>In Progress</option>
+                <option>Completed</option>
+            </select>
+
+            <label>Grade</label>
+            <input type="number" id="grade1" placeholder="-"> / 100
+        </div>
+
+        <h4>Upcoming</h4>
+
+        <div class="assignment-card">
+            <span class="tag">Assignment</span>
+            <span class="tag blue">CS301</span>
+            <span class="status progress">In Progress</span>
+
+            <h3>Assignment 2 - Graph Traversal</h3>
+            <p>Due Dec 2, 2026 · 7% of final grade</p>
+
+            <label>Status</label>
+            <select>
+                <option>In Progress</option>
+                <option>Not Started</option>
+                <option>Completed</option>
+            </select>
+
+            <label>Grade</label>
+            <input type="number" id="grade2" placeholder="-"> / 100
+        </div>
+
+        <div class="assignment-card">
+            <span class="tag">Assignment</span>
+            <span class="tag blue">CS301</span>
+            <span class="status not-started">Not Started</span>
+
+            <h3>Assignment 3 - Dynamic Programming</h3>
+            <p>Due Dec 12, 2026 · 7% of final grade</p>
+
+            <label>Status</label>
+            <select>
+                <option>Not Started</option>
+                <option>In Progress</option>
+                <option>Completed</option>
+            </select>
+
+            <label>Grade</label>
+            <input type="number" id="grade3" placeholder="-"> / 100
+        </div>
+
+        <h4>Submitted</h4>
+
+        <div class="assignment-card">
+            <span class="tag orange">Midterm</span>
+            <span class="tag blue">CS301</span>
+            <span class="status graded">Graded</span>
+
+            <h3>Midterm Exam</h3>
+            <p>Due Feb 27, 2026 · 20% of final grade</p>
+
+            <h2 id="midtermGrade">88%</h2>
+
+            <label>Status</label>
+            <select>
+                <option>Graded</option>
+                <option>In Progress</option>
+                <option>Not Started</option>
+            </select>
+
+            <label>Grade</label>
+            <input type="number" id="grade4" value="88"> / 100
+
+            <br><br>
+
+            <button onclick="updateGrade()">Update Grade</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="../js/assignment-view.js"></script>
+
+</body>
+</html>
