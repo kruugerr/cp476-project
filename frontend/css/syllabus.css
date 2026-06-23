@@ -11,11 +11,13 @@ body {
 }
 
 .sidebar {
-    width: 230px;
+    width: 240px;
     background-color: #111;
     color: white;
-    padding: 18px;
-    position: relative;
+    min-height: 100vh;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
 .logo {
@@ -25,7 +27,8 @@ body {
 }
 
 .logo h2 {
-    font-size: 20px;
+    margin: 0;
+    font-size: 24px;
 }
 
 .circle {
@@ -76,10 +79,7 @@ body {
 }
 
 .user {
-    position: absolute;
-    bottom: 18px;
-    left: 18px;
-    right: 18px;
+    margin-top: auto;
     border-top: 1px solid #333;
     padding-top: 15px;
     display: flex;
