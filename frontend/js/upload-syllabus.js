@@ -1,17 +1,62 @@
-let pdfFile = document.getElementById("pdfFile");
-let extractBtn = document.getElementById("extractBtn");
-let fileMessage = document.getElementById("fileMessage");
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Syllabus</title>
+    <link rel="stylesheet" href="../css/syllabus.css">
+</head>
+<body>
 
-extractBtn.addEventListener("click", function () {
-    if (pdfFile.files.length === 0) {
-        alert("Please choose a PDF file first.");
-        return;
-    }
+    <div class="layout">
 
-    let fileName = pdfFile.files[0].name;
-    fileMessage.innerHTML = "Selected file: " + fileName;
+        <div class="sidebar">
+            <h2>Trackr</h2>
 
-    alert("AI extraction started.");
+            <p class="semester">Spring 2026 - Week 6</p>
 
-    window.location.href = "extraction-review.html";
-});
+            <a href="dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="assignments.html">Assignment</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="gpa-tracker.html">GPA Tracker</a>
+            <a class="active" href="upload-syllabus.html">Upload Syllabus</a>
+            <a href="settings.html">Settings</a>
+        </div>
+
+        <div class="main">
+
+            <div class="topbar">
+                <h3>Settings</h3>
+                <input type="text" placeholder="Search courses, assignments">
+            </div>
+
+            <h1>Add a new course</h1>
+            <p>Upload your syllabus PDF and the system will extract the important details.</p>
+
+            <div class="steps">
+                <span class="active-step">1 Upload PDF</span>
+                <span>2 Course details</span>
+                <span>3 AI extraction</span>
+                <span>4 Review & confirm</span>
+            </div>
+
+            <div class="upload-box">
+                <h2>Drop your syllabus here</h2>
+                <p>Choose your PDF file to upload.</p>
+
+                <input type="file" id="pdfFile" accept="application/pdf">
+
+                <p id="fileMessage"></p>
+            </div>
+
+            <div class="buttons">
+                <a href="dashboard.html" class="cancel-btn">Cancel</a>
+                <button id="extractBtn">Extract with AI</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="../js/upload-syllabus.js"></script>
+</body>
+</html>
