@@ -8,19 +8,76 @@ body{
     display:flex;
 }
 
-.sidebar{
-    width:220px;
-    background:black;
-    color:white;
-    min-height:100vh;
-    padding:20px;
+.sidebar {
+    width: 240px;
+    background-color: #111;
+    color: white;
+    min-height: 100vh;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
-.sidebar a{
-    display:block;
-    color:white;
-    text-decoration:none;
-    margin:10px 0;
+.logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: white;
+    color: black;
+    text-align: center;
+    line-height: 30px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.logo h2 {
+    margin: 0;
+}
+
+.semester-card {
+    background-color: #222;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.semester-label {
+    color: gray;
+    font-size: 11px;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #4a4a4a;
+}
+
+.user-box {
+    margin-top: auto;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+}
+
+.user-box p {
+    margin: 0;
+}
+
+.user-box small {
+    color: gray;
 }
 
 .main{
