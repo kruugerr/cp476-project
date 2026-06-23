@@ -10,25 +10,25 @@ setTimeout(function () {
 }, 2500);
 
 addBtn.onclick = function () {
-    let newAssignment = document.createElement("div");
+    let row = document.createElement("div");
+    row.className = "assignment-row";
 
-    newAssignment.className = "assignment";
-
-    newAssignment.innerHTML = `
-        <label>Assignment Name</label>
+    row.innerHTML = `
         <input type="text" placeholder="Assignment name">
-
-        <label>Due Date</label>
+        <input type="text" placeholder="Type">
         <input type="date">
-
-        <label>Weight</label>
         <input type="text" placeholder="Weight">
+        <select>
+            <option>Not Started</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+        </select>
     `;
 
-    assignmentBox.appendChild(newAssignment);
+    assignmentBox.appendChild(row);
 };
 
 saveBtn.onclick = function () {
-    alert("Course saved successfully.");
+    alert("Course added successfully.");
     window.location.href = "dashboard.html";
 };
