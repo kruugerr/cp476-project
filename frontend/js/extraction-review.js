@@ -14,10 +14,9 @@ addBtn.onclick = function () {
     row.className = "assignment-row";
 
     row.innerHTML = `
-        <input type="text" placeholder="Assignment name">
-        <input type="text" placeholder="Type">
+        <input placeholder="Assignment name">
         <input type="date">
-        <input type="text" placeholder="Weight">
+        <input placeholder="Weight">
         <select>
             <option>Not Started</option>
             <option>In Progress</option>
