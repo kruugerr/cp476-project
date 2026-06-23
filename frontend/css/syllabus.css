@@ -1,7 +1,8 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f7f1f1;
+    background-color: #f7f2f2;
+    color: #1f1f1f;
 }
 
 .layout {
@@ -10,20 +11,52 @@ body {
 }
 
 .sidebar {
-    width: 220px;
+    width: 230px;
     background-color: #111;
     color: white;
-    padding: 20px;
+    padding: 18px;
+    position: relative;
 }
 
-.sidebar h2 {
-    margin-top: 0;
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo h2 {
+    font-size: 20px;
+}
+
+.circle {
+    background-color: white;
+    color: black;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+}
+
+.collapse {
+    margin-left: auto;
 }
 
 .semester {
-    background-color: #222;
+    background-color: #242424;
     padding: 12px;
-    border-radius: 8px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.semester small {
+    color: #aaa;
+    font-size: 11px;
+}
+
+.semester p {
+    margin: 4px 0 0;
     font-size: 14px;
 }
 
@@ -31,41 +64,92 @@ body {
     display: block;
     color: white;
     text-decoration: none;
-    padding: 10px;
-    margin-top: 8px;
-    border-radius: 6px;
+    padding: 11px;
+    border-radius: 8px;
+    margin-bottom: 7px;
+    font-size: 15px;
 }
 
 .sidebar a:hover,
 .sidebar .active {
-    background-color: #444;
+    background-color: #555;
+}
+
+.user {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    right: 18px;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.user p {
+    margin: 0;
+}
+
+.user small {
+    color: #ccc;
+}
+
+.user-icon {
+    background-color: white;
+    color: black;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
 }
 
 .main {
     flex: 1;
-    padding: 30px;
 }
 
 .topbar {
+    height: 62px;
     background-color: white;
-    padding: 15px;
-    margin: -30px -30px 30px -30px;
+    border-bottom: 1px solid #d0d0d0;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 0 28px;
 }
 
 .topbar input {
-    width: 300px;
-    padding: 8px;
+    margin-left: auto;
+    width: 420px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.page {
+    padding: 22px 32px;
+}
+
+.page h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.subtext {
+    color: #666;
+    margin-top: 0;
 }
 
 .steps {
-    margin: 25px 0;
+    display: flex;
+    gap: 22px;
+    margin: 28px 0;
+    font-size: 13px;
+    align-items: center;
 }
 
 .steps span {
-    margin-right: 20px;
-    color: gray;
+    color: #777;
 }
 
 .active-step {
@@ -73,33 +157,56 @@ body {
     font-weight: bold;
 }
 
-.upload-box,
-.card,
-.loading-box {
-    background-color: white;
-    padding: 25px;
-    border-radius: 10px;
-    width: 600px;
-    margin-bottom: 20px;
+.done-step {
+    color: black !important;
 }
 
 .upload-box {
+    background-color: white;
     border: 2px dashed #bbb;
+    border-radius: 14px;
+    width: 700px;
+    height: 330px;
     text-align: center;
-    padding: 60px 25px;
+    padding-top: 65px;
 }
 
-.buttons {
-    width: 600px;
+.upload-icon {
+    width: 62px;
+    height: 62px;
+    background-color: #eee;
+    border-radius: 14px;
+    margin: auto;
+    line-height: 62px;
+    font-size: 32px;
+}
+
+.browse-btn {
+    display: inline-block;
+    background-color: #111;
+    color: white;
+    padding: 11px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.browse-btn input {
+    display: none;
+}
+
+.bottom-buttons {
+    width: 700px;
     display: flex;
     justify-content: space-between;
+    margin-top: 22px;
 }
 
 button,
 .cancel-btn {
-    padding: 10px 16px;
     border: none;
-    border-radius: 6px;
+    padding: 11px 20px;
+    border-radius: 8px;
     text-decoration: none;
     cursor: pointer;
     font-weight: bold;
@@ -115,43 +222,141 @@ button {
     color: black;
 }
 
+.loading-card {
+    width: 720px;
+    background-color: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px #ccc;
+    padding: 60px;
+    text-align: center;
+}
+
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 5px solid #ddd;
+    border-top: 5px solid black;
+    border-radius: 50%;
+    margin: auto;
+    animation: spin 1s linear infinite;
+}
+
+.progress {
+    background-color: #ddd;
+    height: 10px;
+    border-radius: 20px;
+    margin-top: 30px;
+}
+
+.progress-fill {
+    background-color: black;
+    height: 10px;
+    border-radius: 20px;
+    animation: load 2.5s linear;
+}
+
+.review-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+}
+
+.info-card {
+    background-color: white;
+    border-radius: 13px;
+    box-shadow: 0 2px 8px #ddd;
+    padding: 18px;
+}
+
+.info-card h3 {
+    font-size: 14px;
+    margin-top: 0;
+}
+
+.info-card h3 span {
+    background-color: #d6f3df;
+    color: #158246;
+    font-size: 11px;
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin-left: 8px;
+}
+
 label {
     display: block;
-    margin-top: 12px;
+    margin-top: 9px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #555;
+}
+
+input,
+textarea,
+select {
+    width: 95%;
+    padding: 8px;
+    border: none;
+    border-radius: 7px;
+    background-color: #f1eeee;
+    margin-top: 4px;
+}
+
+textarea {
+    height: 60px;
+}
+
+.assignment-card {
+    grid-column: span 2;
+}
+
+.table-head,
+.assignment-row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.2fr 0.9fr 1.2fr;
+    gap: 8px;
+    align-items: center;
+}
+
+.table-head p {
+    font-size: 10px;
+    color: #777;
     font-weight: bold;
 }
 
-input {
-    width: 90%;
-    padding: 9px;
-    margin-top: 5px;
+.assignment-row {
+    margin-bottom: 8px;
 }
 
-.assignment {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
+.add-btn {
+    background-color: white;
+    color: #444;
+    margin-top: 8px;
+}
+
+.review-buttons {
+    width: 100%;
 }
 
 .hide {
     display: none;
 }
 
-.progress {
-    width: 100%;
-    height: 10px;
-    background-color: #ddd;
-    margin-top: 20px;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.progress-fill {
-    width: 100%;
-    height: 10px;
-    background-color: #111;
+@keyframes load {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
     .layout {
         flex-direction: column;
     }
@@ -160,18 +365,31 @@ input {
         width: auto;
     }
 
+    .user {
+        position: static;
+        margin-top: 20px;
+    }
+
     .upload-box,
-    .card,
-    .loading-box,
-    .buttons {
+    .bottom-buttons,
+    .loading-card {
         width: auto;
     }
 
-    .topbar {
-        display: block;
+    .review-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .assignment-card {
+        grid-column: span 1;
+    }
+
+    .assignment-row,
+    .table-head {
+        grid-template-columns: 1fr;
     }
 
     .topbar input {
-        width: 90%;
+        width: 200px;
     }
 }
