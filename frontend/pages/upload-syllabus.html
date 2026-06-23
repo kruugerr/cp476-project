@@ -6,31 +6,53 @@
 </head>
 <body>
 
-    <div class="layout">
+<div class="layout">
 
-        <div class="sidebar">
+    <div class="sidebar">
+        <div class="logo">
+            <span class="circle">T</span>
             <h2>Trackr</h2>
-
-            <p class="semester">Spring 2026 - Week 6</p>
-
-            <a href="dashboard.html">Dashboard</a>
-            <a href="courses.html">Courses</a>
-            <a href="assignments.html">Assignment</a>
-            <a href="calendar.html">Calendar</a>
-            <a href="gpa-tracker.html">GPA Tracker</a>
-            <a class="active" href="upload-syllabus.html">Upload Syllabus</a>
-            <a href="settings.html">Settings</a>
+            <span class="collapse">≪</span>
         </div>
 
-        <div class="main">
+        <div class="semester">
+            <small>SEMESTER</small>
+            <p>Spring 2026 - Week 11</p>
+        </div>
 
-            <div class="topbar">
-                <h3>Settings</h3>
-                <input type="text" placeholder="Search courses, assignments">
+        <a href="dashboard.html">⌂ Dashboard</a>
+        <a href="courses.html">▣ Courses</a>
+        <a href="assignments.html">✎ Assignment</a>
+        <a href="calendar.html">▣ Calendar</a>
+        <a href="gpa-tracker.html">⌁ GPA Tracker</a>
+        <a class="active" href="upload-syllabus.html">▰ Upload Syllabus</a>
+        <a href="settings.html">⚙ Settings</a>
+
+        <div class="user">
+            <span class="user-icon">◉</span>
+            <div>
+                <p>Alex Chen</p>
+                <small>Year 3</small>
             </div>
+        </div>
+    </div>
 
+    <div class="main">
+
+        <div class="topbar">
+            <span class="menu">☰</span>
+            <span>Settings</span>
+            <input type="text" placeholder="Search courses, assignments...">
+            <span>⌕</span>
+            <span>🔔</span>
+            <span>👤</span>
+        </div>
+
+        <div class="page">
             <h1>Add a new course</h1>
-            <p>Upload your syllabus PDF and the system will extract the important details.</p>
+            <p class="subtext">
+                Upload your syllabus PDF and our AI will extract all the important details for you
+            </p>
 
             <div class="steps">
                 <span class="active-step">1 Upload PDF</span>
@@ -40,23 +62,31 @@
             </div>
 
             <div class="upload-box">
-                <h2>Drop your syllabus here</h2>
-                <p>Choose your PDF file to upload.</p>
+                <div class="upload-icon">⇧</div>
 
-                <input type="file" id="pdfFile" accept="application/pdf">
+                <h3>Drop your syllabus here</h3>
+                <p>Drag and drop your PDF or click to browse.</p>
+                <p>One syllabus per course upload.</p>
 
+                <label class="browse-btn">
+                    Browse files
+                    <input type="file" id="pdfFile" accept="application/pdf">
+                </label>
+
+                <small>PDF only · Max 20 MB</small>
                 <p id="fileMessage"></p>
             </div>
 
-            <div class="buttons">
+            <div class="bottom-buttons">
                 <a href="dashboard.html" class="cancel-btn">Cancel</a>
                 <button id="extractBtn">Extract with AI</button>
             </div>
-
         </div>
 
     </div>
 
-    <script src="../js/upload-syllabus.js"></script>
+</div>
+
+<script src="../js/upload-syllabus.js"></script>
 </body>
 </html>
