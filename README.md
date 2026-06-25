@@ -25,15 +25,15 @@ This app lets students upload a course syllabus and have it automatically parsed
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | |
-| Backend | |
-| Database | |
-| Auth | |
-| AI / LLM | |
-| Reminders | |
-| Hosting | |
+| Layer     | Technology |
+| --------- | ---------- |
+| Frontend  |            |
+| Backend   |            |
+| Database  |            |
+| Auth      |            |
+| AI / LLM  |            |
+| Reminders |            |
+| Hosting   |            |
 
 ---
 
@@ -47,10 +47,10 @@ git clone https://github.com/kruugerr/cp476-project.git
 cd cp476-project
 
 # install dependencies
-# TBD
+npm install
 
 # run locally
-# TBD
+npm run start
 ```
 
 ---
@@ -68,12 +68,12 @@ cp476-project/
 
 ## Team
 
-| Name | GitHub |
-|------|--------|
-| Zach Gould| @kruugerr |
-| Zohra Haidary| @HZohra |
-| Tyler Rizzi| @Rizzi7 |
-| | |
+| Name          | GitHub      |
+| ------------- | ----------- |
+| Zach Gould    | @kruugerr   |
+| Zohra Haidary | @HZohra     |
+| Tyler Rizzi   | @Rizzi7     |
+| Thanh Phan    | @fanggodzzz |
 
 ---
 
