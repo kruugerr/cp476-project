@@ -1,0 +1,103 @@
+/* GPA Tracker page — page-specific styles.
+   Shared layout (.sidebar, .topbar, .card) comes from app-pages.css. */
+
+.gpa-scale-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0;
+}
+
+.inline-label {
+    display: inline;
+    margin: 0;
+    font-weight: bold;
+}
+
+.gpa-scale-row select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* Top summary cards */
+.summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.summary-card small {
+    color: #777;
+    font-size: 11px;
+}
+
+.big-number {
+    font-size: 34px;
+    font-weight: bold;
+    margin: 6px 0;
+}
+
+.muted {
+    color: #999;
+}
+
+/* Two-column grid: breakdown + calculator */
+.gpa-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.gpa-grid .card h2 {
+    margin-top: 0;
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.breakdown-row:last-child {
+    border-bottom: none;
+}
+
+.breakdown-row p {
+    margin: 3px 0 0;
+    color: #777;
+    font-size: 13px;
+}
+
+/* Calculator */
+.gpa-grid .card input {
+    width: 95%;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    padding: 9px;
+}
+
+.result-box {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 8px;
+    background-color: #f1eeee;
+    font-weight: bold;
+}
+
+.result-box.good {
+    background-color: #d7f5df;
+    color: green;
+}
+
+.result-box.bad {
+    background-color: #ffd6d6;
+    color: red;
+}
+
+.hide {
+    display: none;
+}
