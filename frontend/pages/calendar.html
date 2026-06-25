@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendar</title>
+    <link rel="stylesheet" href="../css/pages/app-pages.css">
+    <link rel="stylesheet" href="../css/pages/calendar.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-circle">T</div>
+            <h2>Trackr</h2>
+            <span class="collapse">&lt;&lt;</span>
+        </div>
+
+        <div class="semester-card">
+            <small>SEMESTER</small>
+            <p>Spring 2026 - Week 11</p>
+        </div>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="assignments-view.html">Assignment</a>
+        <a class="active" href="calendar.html">Calendar</a>
+        <a href="gpa-tracker.html">GPA Tracker</a>
+        <a href="upload-syllabus.html">Upload Syllabus</a>
+        <a href="reminders.html">Reminders</a>
+        <a href="settings.html">Settings</a>
+
+        <div class="user-box">
+            <div class="user-circle">A</div>
+            <div>
+                <p>Alex Chen</p>
+                <small>Year 3</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <span>Calendar</span>
+            <input type="text" placeholder="Search courses, assignments...">
+            <span>⌕</span>
+            <span>🔔</span>
+            <span>👤</span>
+        </div>
+
+        <div class="page">
+
+            <div class="cal-header">
+                <div>
+                    <h1>Calendar</h1>
+                    <p class="subtext">Track deadlines, exams, and reminders</p>
+                </div>
+                <div class="view-toggle">
+                    <span id="month-btn" class="toggle-btn active" onclick="setView('month')">Month</span>
+                    <span id="week-btn" class="toggle-btn" onclick="setView('week')">Week</span>
+                </div>
+            </div>
+
+            <div id="warning-box" class="warning hide"></div>
+
+            <div class="card cal-card">
+                <div class="cal-top">
+                    <div>
+                        <h2 id="month-label">Month</h2>
+                        <small id="semester-label">Spring 2026 - Week 11</small>
+                    </div>
+                    <div class="cal-nav">
+                        <span onclick="prevMonth()">&lt;</span>
+                        <span onclick="nextMonth()">&gt;</span>
+                    </div>
+                </div>
+
+                <div id="month-view">
+                    <div class="weekday-row">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span>
+                        <span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+                    <div id="cal-grid" class="cal-grid"></div>
+                </div>
+
+                <div id="week-view" class="hide">
+                    <div id="week-list"></div>
+                </div>
+
+                <div class="legend">
+                    <span><i class="dot assignment"></i>Assignment</span>
+                    <span><i class="dot exam"></i>Exam</span>
+                    <span><i class="dot lab"></i>Lab</span>
+                    <span><i class="dot reminder"></i>Reminder</span>
+                </div>
+            </div>
+
+            <div class="cal-bottom">
+
+                <div class="card">
+                    <h2>Upcoming</h2>
+                    <div id="upcoming-list"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Filter Events</h2>
+                    <label class="filter-row">
+                        <input type="checkbox" id="f-assignment" checked onchange="render()">
+                        <span><i class="dot assignment"></i>Assignments</span>
+                    </label>
+                    <label class="filter-row">
+                        <input type="checkbox" id="f-exam" checked onchange="render()">
+                        <span><i class="dot exam"></i>Exams</span>
+                    </label>
+                    <label class="filter-row">
+                        <input type="checkbox" id="f-lab" checked onchange="render()">
+                        <span><i class="dot lab"></i>Labs</span>
+                    </label>
+                    <label class="filter-row">
+                        <input type="checkbox" id="f-reminder" checked onchange="render()">
+                        <span><i class="dot reminder"></i>Reminders</span>
+                    </label>
+                </div>
+
+                <div class="card">
+                    <h2>This Week</h2>
+                    <div id="week-glance"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="../js/calendar.js"></script>
+</body>
+</html>

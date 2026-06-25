@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reminders</title>
+    <link rel="stylesheet" href="../css/pages/app-pages.css">
+    <link rel="stylesheet" href="../css/pages/reminders.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-circle">T</div>
+            <h2>Trackr</h2>
+            <span class="collapse">&lt;&lt;</span>
+        </div>
+
+        <div class="semester-card">
+            <small>SEMESTER</small>
+            <p>Spring 2026 - Week 11</p>
+        </div>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="assignments-view.html">Assignment</a>
+        <a href="calendar.html">Calendar</a>
+        <a href="gpa-tracker.html">GPA Tracker</a>
+        <a href="upload-syllabus.html">Upload Syllabus</a>
+        <a class="active" href="reminders.html">Reminders</a>
+        <a href="settings.html">Settings</a>
+
+        <div class="user-box">
+            <div class="user-circle">A</div>
+            <div>
+                <p>Alex Chen</p>
+                <small>Year 3</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <span>Reminders</span>
+            <input type="text" placeholder="Search courses, assignments...">
+            <span>⌕</span>
+            <span>🔔</span>
+            <span>👤</span>
+        </div>
+
+        <div class="page">
+
+            <div id="create-btn" class="create-reminder" onclick="showForm()">
+                + Create New Reminder
+            </div>
+
+            <div id="create-form" class="reminder-form hide">
+                <input type="text" id="new-title" placeholder="Reminder title">
+                <select id="new-type">
+                    <option>Assignment</option>
+                    <option>Exam</option>
+                    <option>Quiz</option>
+                    <option>Study Session</option>
+                </select>
+                <select id="new-priority">
+                    <option value="high">high</option>
+                    <option value="medium">medium</option>
+                    <option value="low">low</option>
+                </select>
+                <button onclick="addReminder()">Add</button>
+                <span class="cancel-btn" onclick="hideForm()">Cancel</span>
+            </div>
+
+            <div id="reminder-list"></div>
+
+            <div class="reminder-settings">
+                <div class="card settings-card">
+                    <h2>Notification Settings</h2>
+
+                    <div class="setting-row">
+                        <div>
+                            <strong>Assignment Reminders</strong>
+                            <p>Get notified 24 hours before due dates</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div>
+                            <strong>Exam Reminders</strong>
+                            <p>Get notified 1 week before exams</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div>
+                            <strong>Study Session Alerts</strong>
+                            <p>Remind me 15 minutes before sessions</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="card settings-card">
+                    <h2>Notification Setup</h2>
+
+                    <div class="setting-row">
+                        <div>
+                            <strong>Setup WhatsApp Notification</strong>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div>
+                            <strong>Setup Email Notification</strong>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="../js/reminders.js"></script>
+</body>
+</html>

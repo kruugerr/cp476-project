@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings</title>
+    <link rel="stylesheet" href="../css/pages/app-pages.css">
+    <link rel="stylesheet" href="../css/pages/settings.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-circle">T</div>
+            <h2>Trackr</h2>
+            <span class="collapse">&lt;&lt;</span>
+        </div>
+
+        <div class="semester-card">
+            <small>SEMESTER</small>
+            <p>Spring 2026 - Week 11</p>
+        </div>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="assignments-view.html">Assignment</a>
+        <a href="calendar.html">Calendar</a>
+        <a href="gpa-tracker.html">GPA Tracker</a>
+        <a href="upload-syllabus.html">Upload Syllabus</a>
+        <a href="reminders.html">Reminders</a>
+        <a class="active" href="settings.html">Settings</a>
+
+        <div class="user-box">
+            <div class="user-circle">A</div>
+            <div>
+                <p>Alex Chen</p>
+                <small>Year 3</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <span>Settings</span>
+            <input type="text" placeholder="Search courses, assignments...">
+            <span>⌕</span>
+            <span>🔔</span>
+            <span>👤</span>
+        </div>
+
+        <div class="page">
+
+            <h1>Settings</h1>
+            <p class="subtext">Manage your profile and preferences</p>
+
+            <div class="settings-layout">
+
+                <div class="settings-nav">
+                    <a href="#profile">Profile</a>
+                    <a href="#appearance">Appearance</a>
+                    <a href="#notifications">Notifications</a>
+                    <a href="#reminders">Reminders</a>
+                    <a href="#danger">Danger zone</a>
+                </div>
+
+                <div class="settings-content">
+
+                    <div id="profile" class="card">
+                        <h2>Profile</h2>
+                        <p class="subtext">Your personal information and account details</p>
+
+                        <label>Full name</label>
+                        <input type="text" id="full-name" value="Alex Chen">
+
+                        <label>Student ID</label>
+                        <input type="text" id="student-id" value="210234567">
+
+                        <label>Email address</label>
+                        <input type="text" id="email" value="a.chen@mylaurier.ca">
+
+                        <label>Program</label>
+                        <input type="text" id="program" value="Computer Science">
+
+                        <label>Year of study</label>
+                        <input type="number" id="year" value="3">
+
+                        <div class="settings-buttons">
+                            <span class="cancel-btn" onclick="resetProfile()">Cancel</span>
+                            <button onclick="saveProfile()">Save changes</button>
+                        </div>
+
+                        <div id="profile-msg" class="result-box hide"></div>
+                    </div>
+
+                    <div id="appearance" class="card">
+                        <h2>Appearance</h2>
+                        <p class="subtext">Customize how Trackr looks for you</p>
+
+                        <label>Theme</label>
+                        <div class="theme-row">
+                            <div id="light-btn" class="theme-btn active" onclick="setTheme('light')">Light mode</div>
+                            <div id="dark-btn" class="theme-btn" onclick="setTheme('dark')">Dark mode</div>
+                        </div>
+
+                        <label>GPA scale</label>
+                        <select id="gpa-scale">
+                            <option value="4">4.0 Scale</option>
+                            <option value="12">12.0 Scale</option>
+                        </select>
+
+                        <label>Language</label>
+                        <select id="language">
+                            <option>English (Canada)</option>
+                            <option>French (Canada)</option>
+                        </select>
+                    </div>
+
+                    <div id="notifications" class="card">
+                        <h2>Notifications</h2>
+                        <p class="subtext">Choose how you want to be notified</p>
+
+                        <div class="setting-row">
+                            <div>
+                                <strong>Email Notifications</strong>
+                                <p>Send reminders to your email</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-row">
+                            <div>
+                                <strong>WhatsApp Notifications</strong>
+                                <p>Send reminders to your phone</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="reminders" class="card">
+                        <h2>Reminders</h2>
+                        <p class="subtext">Default timing for new reminders</p>
+
+                        <label>Remind me before due date</label>
+                        <select id="reminder-time">
+                            <option>1 day before</option>
+                            <option>2 days before</option>
+                            <option>3 days before</option>
+                            <option>1 week before</option>
+                        </select>
+
+                        <label>Default method</label>
+                        <select id="reminder-method">
+                            <option>Email</option>
+                            <option>WhatsApp</option>
+                        </select>
+                    </div>
+
+                    <div id="danger" class="card">
+                        <h2>Danger zone</h2>
+                        <p class="subtext">These actions affect your account</p>
+
+                        <div class="setting-row">
+                            <div>
+                                <strong>Log out</strong>
+                                <p>Sign out of your account</p>
+                            </div>
+                            <span class="cancel-btn" onclick="logout()">Log out</span>
+                        </div>
+
+                        <div class="setting-row">
+                            <div>
+                                <strong>Delete account</strong>
+                                <p>Permanently remove your account and data</p>
+                            </div>
+                            <span class="danger-btn" onclick="deleteAccount()">Delete</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="../js/settings.js"></script>
+</body>
+</html>
