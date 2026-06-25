@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Trackr Sidebar</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">T</div>
+                <h2>Trackr</h2>
+            </div>
+        </div>
+
+        <section class="semester-section">
+            <small>SEMESTER</small>
+
+            <!-- Dynamically populated -->
+            <h3 id="semester-name">Current Semester</h3>
+        </section>
+
+        <nav>
+            <a href="../pages/dashboard.html">Dashboard</a>
+            <a href="../pages/courses.html">Courses</a>
+            <a href="../pages/assignments-view.html">Assignments</a>
+            <a href="../pages/calendar.html">Calendar</a>
+            <a href="../pages/gpa-tracker.html">GPA Tracker</a>
+            <a href="../pages/upload-syllabus.html">Upload Syllabus</a>
+            <a href="../pages/settings.html">Settings</a>
+        </nav>
+
+        <footer>
+            <div class="user-avatar">👤</div>
+            <div class="user-info">
+                <!-- Dynamic -->
+                <strong id="user-name">User Name</strong>
+                <p>Student</p>
+            </div>
+            <!--Logout link -->
+            <a href="../pages/login.html">Logout</a>
+        </footer>
+
+    </aside>
+</body>
+</html>

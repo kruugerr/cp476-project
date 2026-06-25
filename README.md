@@ -72,6 +72,7 @@ cp476-project/
 |------|--------|
 | Zach Gould| @kruugerr |
 | Zohra Haidary| @HZohra |
+| Tyler Rizzi| @Rizzi7 |
 | | |
 
 ---

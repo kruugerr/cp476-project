@@ -1,4 +1,4 @@
-// frontend/js/pages/signup.js
+
 import { initPasswordChecklist } from "../components/passwordChecklist.js";
 import { isEmail, isStrongPassword, setFieldError, clearFieldError } from "../validation.js";
 
@@ -16,6 +16,12 @@ initPasswordChecklist({ password, confirm, panel });
 [email, password].forEach((el) =>
   el.addEventListener("input", () => clearFieldError(el))
 );
+
+// route to the correct home screen based on selected role
+function routeByRole() {
+  const role = form.querySelector('input[name="role"]:checked')?.value || "student";
+  window.location.href = role === "admin" ? "admin-dashboard.html" : "dashboard.html";
+}
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -36,7 +42,10 @@ form.addEventListener("submit", (e) => {
 
   if (firstBad) { firstBad.focus(); return; }
 
-  // valid — no backend yet, so route to the correct home screen (US-01)
-  const role = form.querySelector('input[name="role"]:checked')?.value || "student";
-  window.location.href = role === "admin" ? "admin-dashboard.html" : "dashboard.html";
+  // valid — no backend yet (backend: POST credentials, reject duplicate email)
+  routeByRole();
 });
+
+// Google SSO — inert for now, still respects the selected role
+// (backend: replace with real OAuth; role still needs to be captured)
+document.querySelector('[data-action="google-signup"]')?.addEventListener("click", routeByRole);

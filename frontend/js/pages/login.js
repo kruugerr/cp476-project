@@ -1,4 +1,4 @@
-// frontend/js/pages/login.js
+
 import { isEmail, setFieldError, clearFieldError } from "../validation.js";
 
 const form     = document.querySelector(".auth-form");
@@ -14,14 +14,23 @@ form.addEventListener("submit", (e) => {
   let firstBad = null;
   const fail = (el, msg) => { setFieldError(el, msg); firstBad = firstBad || el; };
 
-  if (!email.value.trim())        fail(email, "Email is required.");
-  else if (!isEmail(email.value)) fail(email, "Enter a valid email address.");
+  if (!email.value.trim())
+    fail(email, "Email is required.");
+  else if (!isEmail(email.value)) 
+    fail(email, "Enter a valid email address.");
 
   // on login we only check the password isn't empty — not its strength
-  if (!password.value) fail(password, "Password is required.");
+  if (!password.value) 
+    fail(password, "Password is required.");
 
   if (firstBad) { firstBad.focus(); return; }
 
   // valid — no backend yet, so route to the dashboard
+  window.location.href = "dashboard.html";
+});
+
+// Google SSO — inert for now, routes like the real flow will
+// (backend: replace with real OAuth redirect)
+document.querySelector('[data-action="google-login"]')?.addEventListener("click", () => {
   window.location.href = "dashboard.html";
 });
