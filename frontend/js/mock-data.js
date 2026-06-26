@@ -26,7 +26,7 @@ export const courses = [
 
 /** @type {import('./types.js').Activity[]} */
 export const activities = [
-  { id: 'a1',  courseId: 'c_cs301',   name: 'Assignment 1 — Sorting Algorithms', category: 'Assignment', weight: 6,  dueDate: iso(-2),  status: 'not_started', grade: null },
+  { id: 'a1',  courseId: 'c_cs301',   name: 'Assignment 1 — Sorting Algorithms', category: 'Assignment', weight: 6,  dueDate: iso(-2),  status: 'not_started', grade: null, missingInfo: true },
   { id: 'a2',  courseId: 'c_psy101',  name: 'Reading Response 6',                category: 'Quiz',       weight: 5,  dueDate: iso(0),   status: 'in_progress', grade: null },
   { id: 'a3',  courseId: 'c_cs301',   name: 'Assignment 2 — Graph Traversal',    category: 'Assignment', weight: 7,  dueDate: iso(2),   status: 'in_progress', grade: null },
   { id: 'a4',  courseId: 'c_math201', name: 'Problem Set 4',                     category: 'Assignment', weight: 8,  dueDate: iso(3),   status: 'not_started', grade: null },
