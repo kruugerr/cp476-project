@@ -17,7 +17,7 @@
 .app .card, .app .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-card); padding: 1.25rem 1.35rem; }
 
 /* ---- buttons ---- */
-.app .btn, .app .page button, .app .browse-btn {
+.app .btn, .app .page button, .app .browse-btn, .app .cancel-btn, .app .btn-ghost {
   font: inherit; font-weight: 600; font-size: .9rem; cursor: pointer;
   border: 1px solid transparent; border-radius: var(--radius-lg); padding: .6rem 1.1rem;
   background: var(--primary); color: #fff; box-shadow: var(--glow-primary);
