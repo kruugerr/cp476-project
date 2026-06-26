@@ -1,103 +1,106 @@
-/* GPA Tracker page — page-specific styles.
-   Shared layout (.sidebar, .topbar, .card) comes from app-pages.css. */
+/* ============================================================
+   GPA Tracker page — page-specific styles.
+   Scoped under .app so it inherits the app tokens from
+   app-shell.css and themes correctly (light + dark).
+   Shared surfaces (.card, .subtext, inputs, .page select)
+   come from app-pages.css. JS hooks (ids + result-box
+   good/bad classes) come from js/gpa.js — keep in sync.
+   ============================================================ */
 
-.gpa-scale-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 18px 0;
+/* ---- scale selector ---- */
+.app .gpa-scale-row {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin: 1.1rem 0 1.25rem;
+}
+/* keep this label inline (overrides the block .app label rule) */
+.app .inline-label {
+  display: inline;
+  margin: 0;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.app .gpa-scale-row select {
+  width: auto;
+  min-width: 150px;
+  margin-top: 0;
 }
 
-.inline-label {
-    display: inline;
-    margin: 0;
-    font-weight: bold;
+/* ---- top summary cards ---- */
+.app .summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
-
-.gpa-scale-row select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+.app .summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
 }
-
-/* Top summary cards */
-.summary-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 20px;
+/* the eyebrow label (first <small>) */
+.app .summary-card > small:first-child {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
-
-.summary-card small {
-    color: #777;
-    font-size: 11px;
+.app .big-number {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin: .25rem 0 .1rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
 }
+.app .muted { color: var(--muted); font-size: .75rem; }
 
-.big-number {
-    font-size: 34px;
-    font-weight: bold;
-    margin: 6px 0;
+/* ---- two-column grid: breakdown + calculator ---- */
+.app .gpa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
+.app .gpa-grid .card h2 { margin-top: 0; font-size: 1.1rem; letter-spacing: -.01em; }
 
-.muted {
-    color: #999;
+/* ---- grade breakdown ---- */
+.app .breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .8rem 0;
+  border-bottom: 1px solid var(--border);
 }
+.app .breakdown-row:last-child { border-bottom: none; }
+.app .breakdown-row strong { font-size: .9rem; }
+.app .breakdown-row p { margin: .15rem 0 0; color: var(--muted); font-size: .8rem; }
 
-/* Two-column grid: breakdown + calculator */
-.gpa-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+/* ---- calculator result ---- */
+.app .result-box {
+  margin-top: 1rem;
+  padding: .85rem 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+  font-size: .88rem;
 }
+.app .result-box.good { background: var(--success-soft); color: var(--success); }
+.app .result-box.bad  { background: var(--danger-soft);  color: var(--danger); }
 
-.gpa-grid .card h2 {
-    margin-top: 0;
+/* ---- utility ---- */
+.app .hide { display: none; }
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+  .app .summary-row { grid-template-columns: repeat(2, 1fr); }
+  .app .gpa-grid { grid-template-columns: 1fr; }
 }
-
-.breakdown-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.breakdown-row:last-child {
-    border-bottom: none;
-}
-
-.breakdown-row p {
-    margin: 3px 0 0;
-    color: #777;
-    font-size: 13px;
-}
-
-/* Calculator */
-.gpa-grid .card input {
-    width: 95%;
-    border: 1px solid #ccc;
-    border-radius: 7px;
-    padding: 9px;
-}
-
-.result-box {
-    margin-top: 16px;
-    padding: 14px;
-    border-radius: 8px;
-    background-color: #f1eeee;
-    font-weight: bold;
-}
-
-.result-box.good {
-    background-color: #d7f5df;
-    color: green;
-}
-
-.result-box.bad {
-    background-color: #ffd6d6;
-    color: red;
-}
-
-.hide {
-    display: none;
+@media (max-width: 560px) {
+  .app .summary-row { grid-template-columns: 1fr; }
 }
