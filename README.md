@@ -41,12 +41,13 @@ This app lets students upload a course syllabus and have it automatically parsed
 
 ### Prerequisites
 
-Before running the project locally, make sure you have the following installed:
+To view the front-end, you only need **one** of:
 
-* Node.js
-* npm
-* PostgreSQL
-* Git
+* **Python 3** — preinstalled on macOS/Linux (recommended, nothing to install), **or**
+* **Node.js + npm** — if you prefer the `npx serve` option below
+
+Plus **Git** to clone the repo. (Node.js and PostgreSQL are only needed for the
+optional back-end/database, which are still in progress.)
 
 ---
 
@@ -63,36 +64,26 @@ cd cp476-project
 
 ### 2. Run the Front-End
 
-run:
+For milestone 02, the app runs entirely on the front-end with built-in mock data (no back-end or database required).
 
-```bash
-npm install
-npm run start
-```
+From the `frontend/` folder, start a local web server on port 5500:
 
-Then open the local host link shown in the terminal.
+**Option A — Python 3
 
----
+bash
+cd frontend
+python3 -m http.server 5500
 
-### 3. Run the Back-End
+Option B — Node.js:
 
-run:
+cd frontend
+npx serve -l 5500
 
-```bash
-npm run dev
-```
+Then open http://localhost:5500 in your browser
 
-The back-end server should run locally, usually at:
-
-```bash
-http://localhost:3000
-```
-
----
-
-### 4. Run the Database
-
-Database setup and integration are still in progress for Milestone 02.
+(Open it through the local server above, do not double-click the HTML files. 
+The pages load shared parts (sidebar, top bar) with fetch(), which browsers block on 
+file://. Serving over http:// is what makes the app work.)
 
 ---
 
