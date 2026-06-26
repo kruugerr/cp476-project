@@ -1,0 +1,14 @@
+{
+    "name": "cp476-project",
+    "version": "1.0.0",
+    "description": "AI-powered school management app for students and teachers.",
+    "main": "index.js",
+    "scripts": {
+      "start": "npx serve frontend",
+      "dev": "npx serve frontend"
+    },
+    "dependencies": {
+      "serve": "^14.2.4"
+    },
+    "devDependencies": {}
+  }
