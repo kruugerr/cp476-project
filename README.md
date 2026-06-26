@@ -74,6 +74,7 @@ cp476-project/
 | Zohra Haidary | @HZohra     |
 | Tyler Rizzi   | @Rizzi7     |
 | Thanh Phan    | @fanggodzzz |
+| Qichen Hao    | @Gam5K      |
 
 ---
 
