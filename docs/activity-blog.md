@@ -100,3 +100,31 @@ A task is done when it is completed, reviewed by a teammate, tested where applic
 - *Out of Scope for Now:* AI study planner, smart deadline risk detection, group study rooms, Pomodoro timer, shared notes.
 
 **Data Model:** Four core entities — `Users`, `Courses`, `Activities`, `Activity Category`. Users → Courses → Activities (each one-to-many). Activity Categories are one-to-many with Activities. User preferences (GPA scale, reminder defaults, dark/light mode) stored on the User record and copied into Activity records on creation.
+
+### Milestone 2 Front-End Progress — June 16, 2026
+- 1 hour
+
+**Attendance:** Tyler, Zach, Thanh, Rafae, Ali, Qichen Hao, Zohra
+
+**Discussion:**
+- Reviewed Milestone 2 front-end progress
+- Pages were assigned and started
+
+**Decisions Made:**
+- [x] Keep the UI functional with mock data while the database/API setup is still being completed
+
+---
+
+### Database & Back-End Planning — June 25, 2026
+- 1 hour
+
+**Attendance:** Tyler, Zach, Thanh, Rafae, Ali, Qichen Hao, Zohra
+
+**Discussion:**
+- Discussed database design and back-end setup
+- Finalized the main data entities: Users, Courses, Activities, Enrollment, and Activity Category
+
+**Decisions Made:**
+- [x] Finalized main entities: Users, Courses, Activities, Enrollment, Activity Category
+- [ ] SQL table creation
+- [ ] ER diagram
