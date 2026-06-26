@@ -52,16 +52,25 @@ function resetProfile() {
 }
 
 function setTheme(mode) {
-    if (mode === "dark") {
-        document.body.classList.add("dark");
-        document.getElementById("dark-btn").classList.add("active");
-        document.getElementById("light-btn").classList.remove("active");
-    } else {
-        document.body.classList.remove("dark");
-        document.getElementById("light-btn").classList.add("active");
-        document.getElementById("dark-btn").classList.remove("active");
-    }
+    // Use the app-wide theme system
+    document.documentElement.setAttribute("data-theme", mode);
+    try {
+        localStorage.setItem("trackr-theme", mode);
+    } catch (e) {}
+    syncThemeButtons();
 }
+
+// Reflect the currently active theme on the Light/Dark buttons.
+function syncThemeButtons() {
+    let mode = document.documentElement.getAttribute("data-theme") || "light";
+    let light = document.getElementById("light-btn");
+    let dark = document.getElementById("dark-btn");
+    if (!light || !dark) return;
+    light.classList.toggle("active", mode !== "dark");
+    dark.classList.toggle("active", mode === "dark");
+}
+
+document.addEventListener("DOMContentLoaded", syncThemeButtons);
 
 function logout() {
     window.location.href = "login.html";
