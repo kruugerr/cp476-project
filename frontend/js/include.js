@@ -1,17 +1,35 @@
 /* Trackr — inject shared partials, then wire the app shell. */
 
+/* Replace a failed include slot with a visible, styled alert so a broken
+   partial never silently deletes the whole shell again. */
+
+   console.log
+function failSlot(slot, url, detail) {
+  const box = document.createElement('div');
+  box.setAttribute('role', 'alert');
+  box.style.cssText =
+    'margin:.5rem;padding:.75rem 1rem;border:1px solid #E1483B;background:#FBE9E6;' +
+    'color:#E1483B;border-radius:.6rem;font:600 .8rem/1.45 system-ui,sans-serif';
+  const hint = location.protocol === 'file:'
+    ? ' — you opened this with file://, so fetch() is blocked. Serve it over http:// (Live Server).'
+    : ' — check the path, folder name, and casing.';
+  box.textContent = `Couldn't load partial: ${url} (${detail})${hint}`;
+  slot.replaceWith(box);
+}
+
 async function includePartials() {
   const slots = [...document.querySelectorAll('[data-include]')];
   await Promise.all(slots.map(async (slot) => {
     const url = slot.getAttribute('data-include');
     try {
       const res = await fetch(url);
-      if (!res.ok) throw new Error(res.status);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const tpl = document.createElement('template');
       tpl.innerHTML = (await res.text()).trim();
       slot.replaceWith(tpl.content);
     } catch (e) {
       console.error('[include] failed to load', url, e);
+      failSlot(slot, url, e.message || String(e));
     }
   }));
 }
@@ -85,7 +103,15 @@ function initShell() {
   body.dispatchEvent(new CustomEvent('shell:ready'));
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function boot() {
   await includePartials();
   initShell();
-});
+}
+
+/* run now if the DOM is already parsed, otherwise wait — same guard
+   dashboard.js uses, so this can never get skipped. */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
