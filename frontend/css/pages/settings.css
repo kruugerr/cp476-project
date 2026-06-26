@@ -15,7 +15,7 @@
 }
 
 .settings-nav a {
-    color: #555;
+    color: var(--muted);
     text-decoration: none;
     padding: 10px 12px;
     border-radius: 8px;
@@ -24,7 +24,7 @@
 }
 
 .settings-nav a:hover {
-    background-color: #eee;
+    background-color: var(--surface-2);
 }
 
 /* Content cards */
@@ -39,7 +39,9 @@
 .settings-content input,
 .settings-content select {
     width: 95%;
-    border: 1px solid #ccc;
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 7px;
     padding: 9px;
 }
@@ -59,18 +61,18 @@
     margin-top: 16px;
     padding: 14px;
     border-radius: 8px;
-    background-color: #f1eeee;
+    background-color: var(--surface-2);
     font-weight: bold;
 }
 
 .result-box.good {
-    background-color: #d7f5df;
-    color: green;
+    background-color: var(--success-soft);
+    color: var(--success);
 }
 
 .result-box.bad {
-    background-color: #ffd6d6;
-    color: red;
+    background-color: var(--danger-soft);
+    color: var(--danger);
 }
 
 /* Theme buttons */
@@ -84,15 +86,15 @@
     flex: 1;
     text-align: center;
     padding: 14px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
 }
 
 .theme-btn.active {
-    background-color: #111;
-    color: white;
-    border-color: #111;
+    background-color: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
 }
 
 /* Setting rows (notifications, danger zone) */
@@ -101,7 +103,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
 
 .setting-row:last-child {
@@ -110,13 +112,13 @@
 
 .setting-row p {
     margin: 3px 0 0;
-    color: #777;
+    color: var(--muted);
     font-size: 13px;
 }
 
 .danger-btn {
-    background-color: #ffd6d6;
-    color: red;
+    background-color: var(--danger-soft);
+    color: var(--danger);
     border: none;
     padding: 10px 18px;
     border-radius: 8px;
@@ -146,7 +148,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--border);
     border-radius: 26px;
     transition: 0.2s;
 }
@@ -164,46 +166,13 @@
 }
 
 .switch input:checked + .slider {
-    background-color: #111;
+    background-color: var(--primary);
 }
 
 .switch input:checked + .slider::before {
     transform: translateX(20px);
 }
 
-/* Dark mode (applied instantly by settings.js) */
-body.dark {
-    background-color: #1a1a1a;
-    color: #eee;
-}
-
-body.dark .topbar {
-    background-color: #222;
-    border-bottom: 1px solid #333;
-}
-
-body.dark .card {
-    background-color: #242424;
-}
-
-body.dark .subtext {
-    color: #aaa;
-}
-
-body.dark .settings-nav a {
-    color: #bbb;
-}
-
-body.dark .settings-nav a:hover {
-    background-color: #333;
-}
-
-body.dark .settings-content input,
-body.dark .settings-content select {
-    background-color: #1a1a1a;
-    color: #eee;
-    border: 1px solid #444;
-}
 
 .hide {
     display: none;
