@@ -6,78 +6,127 @@
 
 ## Overview
 
-This app lets students upload a course syllabus and have it automatically parsed into a structured course (assignments, due dates, grading weights, office hours, and more). Teachers can publish courses with a join code and students enroll to have everything auto-populated into their semester dashboard.
+This app lets students upload a course syllabus and have it automatically parsed into a structured course with assignments, due dates, grading weights, office hours, and other important course information. Teachers can publish courses with a join code, and students can enroll to have course information added to their semester dashboard.
 
 ---
 
 ## Features
 
-- AI-powered syllabus ingestion (PDF or paste)
-- Semester view with calendar and weekly views
-- Course view with grade tracking
-- Assignment tracker with status, hours logged, and grades
-- GPA tracker (4.0 and 12.0 scale)
-- Reminders via email or WhatsApp
-- Teacher course publishing with join codes
-- Enrollment flow
+* AI-powered syllabus ingestion through PDF upload or pasted text
+* Semester dashboard with calendar and weekly views
+* Course view with grade tracking
+* Assignment/activity tracker with due dates, grading weights, status, hours logged, and grades
+* GPA tracker using both 4.0 and 12.0 scales
+* Reminder settings through email or WhatsApp
+* Teacher course publishing with join codes
+* Student enrollment flow
 
 ---
 
 ## Tech Stack
 
-| Layer     | Technology |
-| --------- | ---------- |
-| Frontend  |            |
-| Backend   |            |
-| Database  |            |
-| Auth      |            |
-| AI / LLM  |            |
-| Reminders |            |
-| Hosting   |            |
+| Layer     | Technology                         |
+| --------- | ---------------------------------- |
+| Frontend  | HTML, CSS, JavaScript              |
+| Backend   | Node.js                            |
+| Database  | PostgreSQL                         |
+| Auth      | To be implemented                  |
+| AI / LLM  | To be implemented                  |
+| Reminders | Email / WhatsApp, planned feature  |
+| Hosting   | Local development for Milestone 02 |
 
 ---
 
 ## Getting Started
 
-> Setup instructions will be added once the project scaffold is initialized.
+### Prerequisites
+
+Before running the project locally, make sure you have the following installed:
+
+* Node.js
+* npm
+* PostgreSQL
+* Git
+
+---
+
+## How to Run Locally
+
+### 1. Clone the Repository
 
 ```bash
-# clone the repo
 git clone https://github.com/kruugerr/cp476-project.git
 cd cp476-project
+```
 
-# install dependencies
+---
+
+### 2. Run the Front-End
+
+run:
+
+```bash
 npm install
-
-# run locally
 npm run start
 ```
+
+Then open the local host link shown in the terminal.
+
+---
+
+### 3. Run the Back-End
+
+run:
+
+```bash
+npm run dev
+```
+
+The back-end server should run locally, usually at:
+
+```bash
+http://localhost:3000
+```
+
+---
+
+### 4. Run the Database
+
+Database setup and integration are still in progress for Milestone 02.
 
 ---
 
 ## Project Structure
 
-```
+```text
 cp476-project/
-├── docs/           # planning docs, meeting minutes
-├── src/            # application source code
+├── docs/              # planning docs, meeting minutes, activity blog/wiki
+├── frontend/          # front-end files
+├── backend/           # back-end server files
 └── README.md
 ```
 
 ---
 
-## Team
+## Activity Blog / Wiki
 
-| Name          | GitHub      |
-| ------------- | ----------- |
-| Zach Gould    | @kruugerr   |
-| Zohra Haidary | @HZohra     |
-| Tyler Rizzi   | @Rizzi7     |
-| Thanh Phan    | @fanggodzzz |
-| Qichen Hao    | @Gam5K      |
+The activity blog/wiki is maintained in the project documentation and includes weekly meeting notes, task assignments, progress updates, design decisions, blockers, and resolutions.
+
+---
+
+## Team Member Contributions
+
+| Name          | Contribution Summary                                                                    |
+| ------------- | --------------------------------------------------------------------------------------- |
+| Zach Gould    | Worked on project setup, GitHub repository organization, and development tasks.         |
+| Zohra Haidary | Worked on planning documentation, front-end/design tasks, and project organization.     |
+| Tyler Rizzi   | Worked on back-end setup, README updates, and project documentation. |
+| Thanh Phan    | Worked on development tasks, milestone planning, and implementation support.            |
+| Qichen Hao    | Worked on planning, project documentation, and implementation support.                  |
 
 ---
 
 ## Course
 
-CP476 — Wilfrid Laurier University
+CP476 — Internet Computing
+Wilfrid Laurier University
