@@ -1,8 +1,15 @@
 import express from "express";
 import * as userController from "../controllers/userController.js";
 import { upload } from "../middleware/upload.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
+
+// Every route below this line requires a valid JWT.
+// verifyToken attaches req.user = { user_id, role } from the token,
+// so controllers should use req.user.user_id instead of trusting
+// req.body.userId or req.params.id from the client.
+router.use(verifyToken);
 
 // Dashboard page routes
 router.get("/courses", userController.getCoursesByUserId);

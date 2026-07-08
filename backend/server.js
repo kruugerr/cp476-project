@@ -12,12 +12,7 @@ import userRouter from "./src/routes/userRoute.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
-
-// Port
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 5000;
 
 // Setting
 // app.use(express.static(path.join(process.cwd(), "../frontend")));
@@ -29,3 +24,8 @@ await initDB();
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
+
+// Port — listen only after everything above is ready
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
