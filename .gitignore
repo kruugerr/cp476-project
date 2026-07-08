@@ -9,3 +9,11 @@ swp
 
 # Node (frontend tooling, if any added later)
 node_modules/
+
+# Environment variables (DB password, JWT secret — never commit)
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+*.log

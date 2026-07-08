@@ -1,33 +1,42 @@
 import dotenv from "dotenv";
-import { Pool } from "pg";
+import mysql from "mysql2";
 
 dotenv.config();
 
-const pool = new Pool({
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
+    port: process.env.DB_PORT || 3306,
 
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionLimit: 10,
+    waitForConnections: true,
+    idleTimeout: 30000,
+    connectTimeout: 2000,
 });
 
 let dbExists = false;
 
-// Function to check if the database exists, if not runs without database
+// Checks if the database is reachable; other modules can call isDBExists()
+// to see whether the connection succeeded before running queries.
 export const initDB = async () => {
-    try {
-        const conn = await pool.connect();
-        await client.query("SELECT 1");
-        conn.release();
-        dbExists = true;
-    } catch (err) {
-        dbExists = false;
-    }
+    return new Promise((resolve) => {
+        pool.getConnection((err, conn) => {
+            if (err) {
+                console.error("Database connection failed:", err.message);
+                dbExists = false;
+                return resolve(false);
+            }
+            conn.query("SELECT 1", (err) => {
+                conn.release();
+                dbExists = !err;
+                resolve(dbExists);
+            });
+        });
+    });
 };
 
-export const db = pool;
 export const isDBExists = () => dbExists;
+
+export default pool;

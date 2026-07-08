@@ -5,21 +5,45 @@ export const getAllUsers = (callback) => {
     db.query(query, (err, results) => {
         if (err) {
             console.error("Error fetching users:", err);
-            callback(err, null);
-        } else {
-            callback(null, results);
+            return callback(err, null);
         }
+        callback(null, results);
     });
 };
 
-export const getUserByUsername = (username, callback) => {
-    const query = "SELECT * FROM users WHERE username = ?";
-    db.query(query, [username], (err, results) => {
+export const getUserByEmail = (email, callback) => {
+    const query = "SELECT * FROM users WHERE email = ?";
+    db.query(query, [email], (err, results) => {
         if (err) {
-            console.error("Error fetching user by username:", err);
-            callback(err, null);
-        } else {
-            callback(null, results[0]);
+            console.error("Error fetching user by email:", err);
+            return callback(err, null);
         }
+        callback(null, results[0]);
+    });
+};
+
+export const createUser = (userData, callback) => {
+    const { first_name, last_name, email, password_hash, role } = userData;
+    const query = `
+        INSERT INTO users (first_name, last_name, email, password_hash, role)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(query, [first_name, last_name, email, password_hash, role || "student"], (err, results) => {
+        if (err) {
+            console.error("Error creating user:", err);
+            return callback(err, null);
+        }
+        callback(null, { user_id: results.insertId, first_name, last_name, email, role: role || "student" });
+    });
+};
+
+export const getUserById = (userId, callback) => {
+    const query = "SELECT * FROM users WHERE user_id = ?";
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error("Error fetching user by ID:", err);
+            return callback(err, null);
+        }
+        callback(null, results[0]);
     });
 };
