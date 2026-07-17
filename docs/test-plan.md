@@ -40,6 +40,7 @@ This test plan covers the end-to-end verification of Trackr, our full-stack acad
 
 | ID | Test case | Steps | Expected result | Result | Notes |
 |---|---|---|---|---|---|
+
 | AUTH-01 | Register new user | POST `/auth/register` with valid email, password, role | 201/200, user created, token or success payload returned | | |
 
 | AUTH-02 | Register duplicate email | POST `/auth/register` with an email that already exists | 409 (or 4xx) with clear error, no duplicate row in `users` | | |
@@ -145,14 +146,51 @@ This test plan covers the end-to-end verification of Trackr, our full-stack acad
 
 | UI-07 | Dashboard shows real data after integration | Log in as test student with seeded courses/activities, view dashboard | Counts and lists match the database, not `mock-data.js` values (no "Alex Chen" leftovers) | | Widgets with no backend source handled per §7 decision |
  
-## 7. Known limitations (fill in at code freeze)
+
+
+## 7. Traceability — user stories to test cases
+
+Maps Milestone 1 user stories (docs/user-stories.md / proposal) to the test cases that verify them.
+
+| Story | Feature | Verified by | Coverage notes |
+|---|---|---|---|
+
+| US-01 Authentication | Register/login with role | AUTH-01–AUTH-07, AUTH-11, UI-01, UI-02, UI-03 | Google SSO not implemented in backend (see section 8). Weak-password check is client-side only |
+
+| US-02 Syllabus upload + AI extraction | Upload PDF, extract fields | USER-09, USER-10 | Backend is a stub — extraction not implemented (section 8) |
+
+| US-03 Extraction review & confirm | Edit/confirm parsed fields | — | No backend endpoints exist; UI page only (section 8) |
+
+| US-04 Semester dashboard | Courses, stats, weekly glance | USER-01, USER-02, USER-03, UI-04, UI-07 | Study hours / streak / GPA delta widgets are mock-only (section 8) |
+
+| US-05 Course view | Syllabus details, sorted assignments, grade breakdown | USER-04, USER-06 | Sort-by-due-date verified via `ORDER BY due_date` in USER-02/06 responses |
+
+| US-06 Assignment details | Name, type, due date, weight, status, grade | USER-02, USER-06 | Status is derived (graded/upcoming/overdue); no stored status field |
+
+| US-07 GPA calculator | Scales, current GPA, target calc | USER-03 (partial) | GPA math is frontend-only; backend stores raw grades. Test via UI once integrated |
+
+| US-08 Reminders | Email/WhatsApp deadline reminders | — | No backend reminder/email delivery implemented (section 8) |
+
+| US-09 Calendar monthly | Deadlines across courses | USER-02, UI-04 | Calendar rendering is frontend; data source is `/user/activities` |
+
+| US-10 Calendar weekly | Next-7-days view, priorities | USER-02, UI-04 | Priority level marked "additional feature" in data plan |
+
+| US-11 Settings/profile | Edit profile, preferences | USER-11, USER-12, USER-13 | |
+
+| US-12 Admin dashboard | Metrics, user/course management | ADM-01–ADM-06, SEC-04 | Backend admin routes are read-only; archive/reset-password/disable-account have no endpoints (section 8) |
+
+## 8. Known limitations (fill in at code freeze)
  
 - Frontend currently uses mock APIs (`api.js`, `admin-api.js`); UI-02–UI-04 are blocked until real `fetch()` integration lands (see `INTEGRATION.md`).
 - Admin controllers in progress (Tyler / team) — ADM-01–ADM-06 blocked until merged.
 - Syllabus upload is a stub: the backend confirms file receipt but PDF parsing/extraction is not implemented. The `extraction-review.html` page has no backend support.
 - Dashboard widgets with no backend data source: study hours, study streak, GPA delta/cumulative GPA, and course percent-complete are currently hardcoded in `mock-data.js`. The backend `activities`/`courses` tables do not store this data. Team decision pending: implement, remove, or document as mock-driven.
 - Email delivery for forgot-password: confirm whether real or stubbed; adjust AUTH-08/09 accordingly.
-
+- Google SSO (US-01 acceptance criterion): no backend route exists; email/password only.
+- Extraction review flow (US-03): `extraction-review.html` exists but has no backend endpoints.
+- Reminders (US-08): reminder fields exist in the data plan, but no scheduling/email/WhatsApp delivery is implemented.
+- Admin write actions (US-12): archive course, reset password, disable account have no backend endpoints — admin API is read-only.
+- Weak-password validation is client-side only; the backend accepts any non-empty password.
 
 ## 8. Handoff notes for automated testing
  
