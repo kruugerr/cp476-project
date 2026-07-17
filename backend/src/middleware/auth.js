@@ -1,4 +1,53 @@
+import crypto from "crypto";
+import fs from "fs";
 import jwt from "jsonwebtoken";
+
+let JWT_SECRET = "";
+
+export const initJWTSecret = () => {
+    let envContent = "";
+
+    if (fs.existsSync(".env")) {
+        envContent = fs.readFileSync(".env", "utf8");
+    }
+
+    const newSecret = crypto.randomBytes(64).toString("hex");
+
+    // Replace existing JWT_SECRET
+    if (/^JWT_SECRET=/m.test(envContent)) {
+        JWT_SECRET = envContent.match(/^JWT_SECRET=(.*)$/m)[1];
+        if (
+            !JWT_SECRET ||
+            JWT_SECRET === "GENERATE_A_SECRET_KEY_FOR_JWT" ||
+            JWT_SECRET.length < 128
+        ) {
+            envContent = envContent.replace(
+                /^JWT_SECRET=.*$/m,
+                `JWT_SECRET=${newSecret}`,
+            );
+            JWT_SECRET = newSecret;
+        }
+    } else {
+        // Add it if it does not exist
+        envContent += `\nJWT_SECRET=${newSecret}\n`;
+        JWT_SECRET = newSecret;
+    }
+
+    fs.writeFileSync(".env", envContent);
+};
+
+export const getJWTSecret = () => {
+    return JWT_SECRET;
+};
+
+export const createToken= (user) => {
+    const token = jwt.sign(
+        { user_id: newUser.user_id, role: newUser.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" },
+    );
+    return token;
+};
 
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers["authorization"];
@@ -8,11 +57,12 @@ export const verifyToken = (req, res, next) => {
         return res.status(401).json({ message: "No token provided" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(403).json({ message: "Invalid or expired token" });
+            return res
+                .status(403)
+                .json({ message: "Invalid or expired token" });
         }
-        req.user = decoded; // { user_id, role }
         next();
     });
 };

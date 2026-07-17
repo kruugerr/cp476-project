@@ -10,13 +10,13 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306,
 
-    connectionLimit: 10,
+    connectionLimit: 100,
     waitForConnections: true,
     idleTimeout: 30000,
     connectTimeout: 2000,
 });
 
-let dbExists = false;
+let dbConnected = false;
 
 // Checks if the database is reachable; other modules can call isDBExists()
 // to see whether the connection succeeded before running queries.
@@ -25,18 +25,19 @@ export const initDB = async () => {
         pool.getConnection((err, conn) => {
             if (err) {
                 console.error("Database connection failed:", err.message);
-                dbExists = false;
+                dbConnected = false;
                 return resolve(false);
             }
             conn.query("SELECT 1", (err) => {
                 conn.release();
-                dbExists = !err;
-                resolve(dbExists);
+                dbConnected = !err;
+                if (err) {
+                    console.error("Database ping failed:", err.message);
+                }
+                resolve(dbConnected);
             });
         });
     });
 };
-
-export const isDBExists = () => dbExists;
 
 export default pool;
