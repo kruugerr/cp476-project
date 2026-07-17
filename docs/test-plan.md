@@ -152,7 +152,8 @@ This test plan covers the end-to-end verification of Trackr, our full-stack acad
 - Syllabus upload is a stub: the backend confirms file receipt but PDF parsing/extraction is not implemented. The `extraction-review.html` page has no backend support.
 - Dashboard widgets with no backend data source: study hours, study streak, GPA delta/cumulative GPA, and course percent-complete are currently hardcoded in `mock-data.js`. The backend `activities`/`courses` tables do not store this data. Team decision pending: implement, remove, or document as mock-driven.
 - Email delivery for forgot-password: confirm whether real or stubbed; adjust AUTH-08/09 accordingly.
-- _Add anything still open at submission time — the rubric explicitly rewards honest limitations._
+
+
 ## 8. Handoff notes for automated testing
  
 - Every API case above (AUTH, USER, ADM, SEC) can be automated as HTTP tests: seed the two test accounts, capture tokens in a setup step, assert status codes + response shapes.
