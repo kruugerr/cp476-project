@@ -5,7 +5,7 @@ export function courseCard(c) {
       <span class="ccard__accent"></span>
       <div class="ccard__head">
         <span class="ccard__code">${c.code}</span>
-        <span class="ccard__grade">${c.currentGrade}%</span>
+        <span class="ccard__grade">${c.currentGrade == null ? '—' : c.currentGrade + '%'}</span>
       </div>
       <h4 class="ccard__name">${c.name}</h4>
       <p class="ccard__prof">${c.professor}</p>

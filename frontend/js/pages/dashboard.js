@@ -1,5 +1,5 @@
 /* Trackr — Dashboard page. Renders skeletons, then fills from the api seam. */
-import { getCurrentUser, getSemester, getCourses, getActivities, getStudyHours } from '../api.js';
+import { getCurrentUser, getSemester, getCourses, getActivities } from '../api.js';
 import { statCard, statCardSkeleton } from '../components/statCard.js';
 import { assignmentRow, assignmentRowSkeleton } from '../components/assignmentRow.js';
 import { courseCard, courseCardSkeleton } from '../components/courseCard.js';
@@ -13,21 +13,18 @@ const ICON = {
   gpa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>',
   courses:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
   due:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
-  streak:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s5 4 5 9a5 5 0 0 1-10 0c0-1.5.5-3 1.5-4C9 9 12 8 12 2z"/></svg>',
 };
 
 function showSkeletons() {
-  $('#dashStats').innerHTML = Array.from({ length: 4 }, statCardSkeleton).join('');
+  $('#dashStats').innerHTML = Array.from({ length: 3 }, statCardSkeleton).join('');
   $('#dashUpcoming').innerHTML = Array.from({ length: 6 }, assignmentRowSkeleton).join('');
   $('#dashCourses').innerHTML = Array.from({ length: 5 }, courseCardSkeleton).join('');
   $('#dashGpa').innerHTML = `<div class="sk sk--line" style="width:40%"></div><div class="sk sk--num" style="margin:.8rem 0"></div><div class="sk sk--bar"></div>`;
-  $('#dashStudy').innerHTML = `<div class="sk sk--line" style="width:50%"></div><div class="sk sk--bar" style="height:90px;margin-top:1rem"></div>`;
 }
 
 function animate() {
   requestAnimationFrame(() => {
     document.querySelectorAll('[data-w]').forEach((el) => { el.style.width = el.dataset.w + '%'; });
-    document.querySelectorAll('[data-h]').forEach((el) => { el.style.height = el.dataset.h + '%'; });
     document.querySelectorAll('[data-countup]').forEach(countUp);
   });
 }
@@ -46,10 +43,10 @@ function countUp(el) {
 
 async function init() {
   showSkeletons();
-  let user, semester, courses, activities, studyHours;
+  let user, semester, courses, activities;
   try {
-    [user, semester, courses, activities, studyHours] = await Promise.all([
-      getCurrentUser(), getSemester(), getCourses(), getActivities(), getStudyHours(),
+    [user, semester, courses, activities] = await Promise.all([
+      getCurrentUser(), getSemester(), getCourses(), getActivities(),
     ]);
   } catch (e) {
     $('#dashUpcoming').innerHTML = `<li class="dash-empty">Couldn't load your dashboard. Please refresh.</li>`;
@@ -65,20 +62,24 @@ async function init() {
 
   /* greeting */
   $('#dashName').textContent = user.firstName;
-  $('#dashStatus').textContent = overdue.length
-    ? `You're on track — ${overdue.length} item${overdue.length > 1 ? 's' : ''} need${overdue.length > 1 ? '' : 's'} attention this week.`
-    : `You're all caught up this week. Nice work.`;
+  $('#dashStatus').textContent = !activities.length
+    ? `Upload a syllabus to start tracking your semester.`
+    : overdue.length
+      ? `${overdue.length} item${overdue.length > 1 ? 's' : ''} need${overdue.length > 1 ? '' : 's'} attention this week.`
+      : `You're all caught up this week. Nice work.`;
 
-  /* stat cards */
+  /* stat cards (3): GPA · Active Courses · Due This Week */
+  const gpaTile = user.currentGPA == null
+    ? statCard({ icon: ICON.gpa, value: '—', label: 'Current GPA', accent: 'primary', sub: 'Add grades to see your GPA' })
+    : statCard({ icon: ICON.gpa, value: user.currentGPA.toFixed(2), label: 'Current GPA', accent: 'primary', countup: true,
+        sub: `on a ${user.gpaScale.toFixed(1)} scale` });
+
   $('#dashStats').innerHTML = [
-    statCard({ icon: ICON.gpa, value: user.currentGPA.toFixed(2), label: 'Current GPA', accent: 'primary', countup: true,
-      trend: { dir: user.gpaDelta >= 0 ? 'up' : 'down', text: `${Math.abs(user.gpaDelta).toFixed(2)} from last term` } }),
+    gpaTile,
     statCard({ icon: ICON.courses, value: courses.length, label: 'Active Courses', accent: 'violet',
-      sub: `${courses.reduce((s, c) => s + c.credits, 0)} credits this term` }),
+      sub: semester.term || (courses.length ? `${courses.length} enrolled` : 'No courses yet') }),
     statCard({ icon: ICON.due, value: dueThisWeek.length, label: 'Due This Week', accent: 'progress',
       sub: overdue.length ? `${overdue.length} overdue` : 'Nothing overdue' }),
-    statCard({ icon: ICON.streak, value: user.studyStreak, suffix: '', label: 'Study Streak', accent: 'marker', countup: true,
-      sub: 'days · personal best' }),
   ].join('');
 
   /* upcoming */
@@ -88,33 +89,29 @@ async function init() {
     : `<li class="dash-empty"><b>Nothing due right now.</b><span>Upload a syllabus to start tracking a course.</span></li>`;
 
   /* GPA summary */
-  const gpaPct = Math.round((user.currentGPA / user.gpaScale) * 100);
-  $('#dashGpa').innerHTML = `
-    <div class="dash-card__head"><h2>GPA Summary</h2></div>
-    <div class="gpa-row">
-      <div><span class="gpa-big" data-countup="${user.currentGPA.toFixed(2)}">0.00</span><span class="gpa-scale">/ ${user.gpaScale.toFixed(1)}</span><p class="gpa-cap">This term</p></div>
-      <div class="gpa-cum"><b>${user.cumulativeGPA.toFixed(2)}</b><span>Cumulative</span></div>
-    </div>
-    ${progressBar(gpaPct)}
-    <div class="gpa-foot"><span>${user.creditsThisTerm} credits this term</span><span>Year ${user.year}</span></div>`;
-
-  /* study hours */
-  const maxH = Math.max(...studyHours.map((d) => d.hours));
-  const total = studyHours.reduce((s, d) => s + d.hours, 0);
-  $('#dashStudy').innerHTML = `
-    <div class="dash-card__head"><h2>Study Hours</h2><span class="dash-card__meta">${total.toFixed(1)}h this week</span></div>
-    <div class="study">
-      ${studyHours.map((d) => `
-        <div class="study__col">
-          <div class="study__track"><i data-h="${Math.round((d.hours / maxH) * 100)}"${d.hours === maxH ? ' class="is-peak"' : ''}></i></div>
-          <span class="study__day">${d.day[0]}</span>
-        </div>`).join('')}
-    </div>`;
+  const displayGpa = user.currentGPA != null ? user.currentGPA : user.cumulativeGPA;
+  if (displayGpa == null) {
+    $('#dashGpa').innerHTML = `
+      <div class="dash-card__head"><h2>GPA Summary</h2></div>
+      <div class="dash-empty"><b>No grades yet.</b><span>Add grades to track your GPA.</span></div>`;
+  } else {
+    const gpaPct = Math.round((displayGpa / user.gpaScale) * 100);
+    const cumHtml = user.cumulativeGPA != null
+      ? `<div class="gpa-cum"><b>${user.cumulativeGPA.toFixed(2)}</b><span>Cumulative</span></div>`
+      : '';
+    $('#dashGpa').innerHTML = `
+      <div class="dash-card__head"><h2>GPA Summary</h2></div>
+      <div class="gpa-row">
+        <div><span class="gpa-big" data-countup="${displayGpa.toFixed(2)}">0.00</span><span class="gpa-scale">/ ${user.gpaScale.toFixed(1)}</span><p class="gpa-cap">This term</p></div>
+        ${cumHtml}
+      </div>
+      ${progressBar(gpaPct)}`;
+  }
 
   /* courses */
   $('#dashCourses').innerHTML = courses.length
     ? courses.map(courseCard).join('')
-    : `<div class="dash-empty">No courses yet.</div>`;
+    : `<div class="dash-empty"><b>No courses yet.</b><span>Upload a syllabus to add one.</span></div>`;
 
   animate();
 }
