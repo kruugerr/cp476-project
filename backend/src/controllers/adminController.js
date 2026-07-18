@@ -1,31 +1,45 @@
+import * as adminModel from "../model/adminModel.js";
+
 export const getAllUsers = (req, res) => {
-    console.log("Fetching all users");
-    // Implementation for getting all users
+    adminModel.getAllUsers((err, users) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        res.json(users);
+    });
 };
 
 export const getUser = (req, res) => {
-    const userId = req.params.id;
-    console.log(`Fetching user with ID: ${userId}`);
-    // Implementation for getting a specific user
+    adminModel.getUserById(req.params.id, (err, users) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        if (!users[0]) return res.status(404).json({ message: "User not found" });
+        res.json(users[0]);
+    });
 };
 
 export const getAllCourses = (req, res) => {
-    console.log("Fetching all courses");
-    // Implementation for getting all courses
+    adminModel.getAllCourses((err, courses) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        res.json(courses);
+    });
 };
 
 export const getCourse = (req, res) => {
-    const courseId = req.params.id;
-    console.log(`Fetching course with ID: ${courseId}`);
-    // Implementation for getting a specific course
+    adminModel.getCourseById(req.params.id, (err, courses) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        if (!courses[0]) return res.status(404).json({ message: "Course not found" });
+        res.json(courses[0]);
+    });
 };
 
 export const getStatistics = (req, res) => {
-    console.log("Fetching statistics");
-    // Implementation for getting statistics - Total students, total courses, total syllabus, total activities, total submissions, etc.
+    adminModel.getStatistics((err, statistics) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        res.json(statistics[0]);
+    });
 };
 
 export const getAllUserActivities = (req, res) => {
-    console.log("Fetching all recent users' activities");
-    // Implementation for getting all activities
+    adminModel.getAllActivities((err, activities) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        res.json(activities);
+    });
 };
