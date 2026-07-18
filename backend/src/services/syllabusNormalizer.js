@@ -8,7 +8,7 @@
  *   DATETIME formatting before anything hits an INSERT.
  */
 
-// activity_categories is seeded as: 1 Assignment, 2 Quiz, 3 Exam, 4 Project.
+// activity_categories is: 1 Assignment, 2 Quiz, 3 Exam, 4 Project.
 export const CATEGORY_NAME_TO_ID = {
     Assignment: 1,
     Quiz: 2,
