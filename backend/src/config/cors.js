@@ -1,16 +1,24 @@
-import cors from "cors";
+const cors = function (req, res, next) {
+    res.header(
+        "Access-Control-Allow-Origin",
+        req.headers.origin || "*"
+    );
 
-const allowedOrigins = ["http://localhost:3000", "https://yourfrontend.com"];
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
 
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true,
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization"
+    );
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+
+    next();
 };
 
-export default cors(corsOptions);
+export default cors;
