@@ -1,36 +1,107 @@
-
 import { isEmail, setFieldError, clearFieldError } from "../validation.js";
 
-const form     = document.querySelector(".auth-form");
-const email    = document.getElementById("email");
+const API_URL = "http://localhost:5000";
+const form = document.querySelector(".auth-form");
+const email = document.getElementById("email");
 const password = document.getElementById("password");
+const remember = document.getElementById("remember");
+const submitButton = form.querySelector('button[type="submit"]');
 
-[email, password].forEach((el) =>
-  el.addEventListener("input", () => clearFieldError(el))
-);
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  let firstBad = null;
-  const fail = (el, msg) => { setFieldError(el, msg); firstBad = firstBad || el; };
-
-  if (!email.value.trim())
-    fail(email, "Email is required.");
-  else if (!isEmail(email.value)) 
-    fail(email, "Enter a valid email address.");
-
-  // on login we only check the password isn't empty — not its strength
-  if (!password.value) 
-    fail(password, "Password is required.");
-
-  if (firstBad) { firstBad.focus(); return; }
-
-  // valid — no backend yet, so route to the dashboard
-  window.location.href = "dashboard.html";
+email.addEventListener("input", function () {
+  clearFieldError(email);
 });
 
-// Google SSO — inert for now, routes like the real flow will
-// (backend: replace with real OAuth redirect)
-document.querySelector('[data-action="google-login"]')?.addEventListener("click", () => {
-  window.location.href = "dashboard.html";
+password.addEventListener("input", function () {
+  clearFieldError(password);
+});
+
+form.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  let firstBadField = null;
+
+  function showError(input, message) {
+    setFieldError(input, message);
+
+    if (firstBadField === null) {
+      firstBadField = input;
+    }
+  }
+
+  if (email.value.trim() === "") {
+    showError(email, "Email is required.");
+  } else if (!isEmail(email.value.trim())) {
+    showError(email, "Enter a valid email address.");
+  }
+
+  if (password.value === "") {
+    showError(password, "Password is required.");
+  }
+
+  if (firstBadField !== null) {
+    firstBadField.focus();
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Signing in...";
+
+  try {
+    const response = await fetch(
+      API_URL + "/auth/login",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({ email: email.value.trim(), password: password.value })
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok === false) {
+      throw new Error(
+        data.message || "Login failed."
+      );
+    }
+
+    if (remember.checked) {
+      localStorage.setItem("trackr-token", data.token);
+
+      localStorage.setItem(
+        "trackr-user",
+        JSON.stringify(data.user)
+      );
+    } else {
+      sessionStorage.setItem("trackr-token", data.token);
+
+      sessionStorage.setItem(
+        "trackr-user",
+        JSON.stringify(data.user)
+      );
+    }
+
+    if (data.user.role === "admin") {
+      window.location.href = "admin-dashboard.html";
+    } else {
+      window.location.href = "dashboard.html";
+    }
+  } catch (error) {
+    setFieldError(password, error.message);
+    password.focus();
+  }
+
+  submitButton.disabled = false;
+  submitButton.textContent = "Log in";
+});
+
+const googleButton = document.querySelector(
+  '[data-action="google-login"]'
+);
+
+googleButton.addEventListener("click", function () {
+  alert("Google login is not available yet.");
 });
