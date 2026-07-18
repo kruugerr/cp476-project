@@ -40,10 +40,10 @@ export const getJWTSecret = () => {
     return JWT_SECRET;
 };
 
-export const createToken= (user) => {
+export const createToken = (user) => {
     const token = jwt.sign(
-        { user_id: newUser.user_id, role: newUser.role },
-        process.env.JWT_SECRET,
+        { user_id: user.user_id, role: user.role },
+        JWT_SECRET,
         { expiresIn: "1h" },
     );
     return token;
