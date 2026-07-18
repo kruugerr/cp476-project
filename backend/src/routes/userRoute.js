@@ -23,12 +23,18 @@ router.get(
     userController.getActivitiesByUserIdAndCourseId,
 );
 
-// Upload syllabus routes + add course and activity routes
-router.post(
-    "/upload-syllabus",
-    upload.single("file"),
-    userController.uploadSyllabus,
-);
+// Upload syllabus routes + add course and activity routes.
+const uploadPdf = (req, res, next) => {
+    upload.single("file")(req, res, (err) => {
+        if (err) {
+            return res
+                .status(400)
+                .json({ message: err.message || "File upload failed" });
+        }
+        next();
+    });
+};
+router.post("/upload-syllabus", uploadPdf, userController.uploadSyllabus);
 router.post("/courses/", userController.addCourse);
 
 // Profile page routes

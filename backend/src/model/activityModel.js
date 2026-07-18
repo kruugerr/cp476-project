@@ -1,3 +1,5 @@
+import pool from "../config/db.js";
+
 // All activities for a user, across all their courses. activities has no
 // user_id column — ownership only exists through activities -> courses ->
 // user_id, so this has to join through courses.

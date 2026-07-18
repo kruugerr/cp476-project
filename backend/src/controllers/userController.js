@@ -1,6 +1,8 @@
 import * as userModel from "../model/userModel.js";
 import * as courseModel from "../model/courseModel.js";
 import * as activityModel from "../model/activityModel.js";
+import { extractSyllabus } from "../services/extractor.js";
+import { normalizeExtraction, validateCoursePayload,} from "../services/syllabusNormalizer.js";
 
 // GET /user/courses
 // req.user comes from verifyToken middleware — this is the trustworthy
@@ -48,14 +50,33 @@ export const getActivitiesByUserIdAndCourseId = (req, res) => {
 };
 
 // POST /user/upload-syllabus
-// Still a stub — the actual PDF parsing/extraction logic is Phase 4 work.
-// This just confirms the file made it through multer for now.
-export const uploadSyllabus = (req, res) => {
+export const uploadSyllabus = async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
     }
-    console.log("Received syllabus:", req.file.originalname, req.file.size, "bytes");
-    res.status(202).json({ message: "File received, extraction not yet implemented" });
+
+    const { term, term_start, term_end } = req.body;
+    console.log(
+        "Extracting syllabus:",
+        req.file.originalname,
+        req.file.size,
+        "bytes | term:",
+        term,
+    );
+
+    try {
+        const raw = await extractSyllabus({
+            pdfBuffer: req.file.buffer,
+            term,
+            term_start,
+            term_end,
+        });
+        const result = normalizeExtraction(raw, { term });
+        res.status(200).json(result);
+    } catch (err) {
+        console.error("Syllabus extraction failed:", err.message);
+        res.status(502).json({ message: "Extraction failed. Please try again." });
+    }
 };
 
 // POST /user/courses
@@ -63,11 +84,12 @@ export const uploadSyllabus = (req, res) => {
 // what runs after the student reviews/confirms extracted syllabus data,
 // or adds a course manually.
 export const addCourse = (req, res) => {
-    const { course, activities } = req.body;
-
-    if (!course || !course.course_code || !course.course_name || !course.term) {
-        return res.status(400).json({ message: "Missing required course fields" });
+    // Strict server-side validation/normalization.
+    const { ok, errors, normalized } = validateCoursePayload(req.body);
+    if (!ok) {
+        return res.status(400).json({ message: "Invalid course data", errors });
     }
+    const { course, activities } = normalized;
 
     courseModel.createCourse(req.user.user_id, course, (err, newCourse) => {
         if (err) return res.status(500).json({ message: "Failed to create course" });

@@ -63,6 +63,7 @@ export const verifyToken = (req, res, next) => {
                 .status(403)
                 .json({ message: "Invalid or expired token" });
         }
+        req.user = decoded;
         next();
     });
 };
