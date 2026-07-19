@@ -218,11 +218,26 @@
 .app .hide { display: none; }
 
 /* ---- responsive ---- */
+.app .cal-card { overflow: hidden; }
+
 @media (max-width: 900px) {
   .app .cal-bottom { grid-template-columns: 1fr; }
-}
-@media (max-width: 640px) {
-  .app .cal-grid { gap: 3px; }
-  .app .cal-cell { min-height: 64px; padding: .3rem; }
+  .app .cal-grid { gap: 4px; }
+  .app .cal-cell { min-height: 72px; padding: .35rem; }
   .app .event-pill { font-size: .62rem; }
+}
+
+/* On phones the 7-column grid is too narrow for event text, so month
+   cells show only the colour dots; switch to Week view to read details. */
+@media (max-width: 640px) {
+  .app .weekday-row { font-size: .58rem; }
+  .app .cal-grid { gap: 3px; }
+  .app .cal-cell { min-height: 52px; padding: .25rem; }
+  .app .cal-cell .day-num { font-size: .68rem; }
+  .app .cal-cell .event-pill {
+    font-size: 0;
+    gap: 0;
+    margin-top: .25rem;
+  }
+  .app .cal-cell .event-pill .dot { width: 7px; height: 7px; }
 }
