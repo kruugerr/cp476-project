@@ -4,11 +4,11 @@
     "description": "AI-powered school management app for students and teachers.",
     "main": "index.js",
     "scripts": {
-      "start": "npx serve frontend",
-      "dev": "npx serve frontend"
+        "start": "npx serve frontend",
+        "dev": "npx serve frontend"
     },
     "dependencies": {
-      "serve": "^14.2.4"
-    },
-    "devDependencies": {}
-  }
+        "@anthropic-ai/sdk": "^0.112.3",
+        "serve": "^14.2.4"
+    }
+}
