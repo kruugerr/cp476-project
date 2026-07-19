@@ -10,7 +10,7 @@ This test plan covers the end-to-end verification of Trackr, our full-stack acad
 
 **In scope (we are testing):** authentication(login, signup), user course/activity/profile workflows(user features), admin read endpoints, input validation(reject bad data), and access control (JWT + role checks).
 
-**Out of scope (we are not testing):** load/performance testing, browser compatibility beyond Chrome/Firefox/Edge latest, and any features not implemented by the Milestone 3 code freeze (tracked in §6 Known limitations).
+**Out of scope (we are not testing):** load/performance testing, browser compatibility beyond Chrome/Firefox/Edge latest, and any features not implemented by the Milestone 3 code freeze (tracked in section 6 Known limitations).
 
 ## 2. Test environment
 
@@ -31,9 +31,9 @@ This test plan covers the end-to-end verification of Trackr, our full-stack acad
 
 | Account | Role | Purpose |
 |---|---|---|
-| `student.test@trackr.dev` | student | User workflow + negative admin tests |
+| `student.test@trackr.dev`  password `Trackr2026!`| student | User workflow + negative admin tests |
 
-| `admin.test@trackr.dev` | admin | Admin endpoint tests |
+| `admin.test@trackr.dev` `Trackr2026!` password| admin | Admin endpoint tests |
 
 
 ## 3. Test cases — Authentication (`/auth`)
