@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { getJWTSecret, createToken, verifyToken} from "../middleware/auth.js";
+import { OAuth2Client } from "google-auth-library";
+import { createToken, getJWTSecret } from "../middleware/auth.js";
 import { createUser, getUserByEmail } from "../model/userModel.js";
 
 const JWT_SECRET = getJWTSecret();
@@ -75,14 +75,53 @@ export const userLogin = (req, res) => {
     });
 };
 
-export const userForgotPassword = (req, res) => {
-    const { email } = req.body;
-    console.log("Received email for password reset:", email);
-    // TODO: send reset link — Phase 4 territory, not blocking right now
+async function getGoogleUserInfo(accessToken) {
+    const client = new OAuth2Client();
+
+    client.setCredentials({ access_token: accessToken });
+
+    console.log(accessToken);
+    const response = await client.request({
+        url: "https://www.googleapis.com/oauth2/v3/userinfo",
+    });
+
+    return response.data;
+}
+
+export const userLoginOAuth = async (req, res) => {
+    const accessToken = req.body.access_token;
+
+    try {
+        const googleUser = await getGoogleUserInfo(accessToken);
+        if (!googleUser || !googleUser.email || !googleUser.email_verified) {
+            throw new Error();
+        }
+
+        getUserByEmail(googleUser.email, async (err, user) => {
+            if (err) return res.status(500).json({ message: "Server error" });
+            if (!user) {
+                return res
+                    .status(401)
+                    .json({ message: "Invalid Google credentials" });
+            }
+
+            const token = createToken(user);
+            const { password_hash, ...safeUser } = user;
+            res.json({ user: safeUser, token });
+        });
+    } catch (error) {
+        res.status(401).json({ message: "Invalid Google credentials" });
+    }
 };
 
 export const userResetPassword = (req, res) => {
     const { email, newPassword } = req.body;
     console.log("Received password reset request for:", email);
     newPassword = bcrypt.hash(newPassword, 10);
+};
+
+export const userForgotPassword = (req, res) => {
+    const { email } = req.body;
+    console.log("Received email for password reset:", email);
+    // TODO: send reset link — Phase 4 territory, not blocking right now
 };
