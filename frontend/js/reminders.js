@@ -1,14 +1,27 @@
-let reminders = [
-    { id: 1, title: "ML Project Proposal Due", type: "Assignment", priority: "high" },
-    { id: 2, title: "ML Project Proposal Due", type: "Assignment", priority: "high" },
-    { id: 3, title: "ML Project Proposal Due", type: "Assignment", priority: "high" }
-];
+import { getActivities, getCourses } from "./api.js";
+import { requireAuth } from "./auth.js";
 
-let nextId = 4;
+let reminders = [];
+let nextId = 1;
+
+function priorityForDate(iso) {
+    if (!iso) return "low";
+    let due = new Date(iso);
+    let now = new Date();
+    let days = (due - now) / 86400000;
+    if (days <= 2) return "high";
+    if (days <= 7) return "medium";
+    return "low";
+}
 
 function renderReminders() {
     let list = document.getElementById("reminder-list");
     list.innerHTML = "";
+
+    if (reminders.length === 0) {
+        list.innerHTML = '<p class="subtext">No upcoming reminders.</p>';
+        return;
+    }
 
     for (let r of reminders) {
         let card = document.createElement("div");
@@ -75,4 +88,43 @@ function editReminder(id) {
     }
 }
 
-renderReminders();
+async function init() {
+    if (!requireAuth()) return;
+    try {
+        let [activities, courses] = await Promise.all([getActivities(), getCourses()]);
+        let codeById = {};
+        for (let c of courses) codeById[c.id] = c.code;
+
+        let now = new Date();
+        let upcoming = activities.filter(function (a) {
+            return a.status !== "graded" && a.dueDate && new Date(a.dueDate) >= now;
+        });
+        upcoming.sort(function (a, b) {
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+
+        reminders = upcoming.slice(0, 8).map(function (a) {
+            let code = codeById[a.courseId] || "";
+            return {
+                id: nextId++,
+                title: (code ? code + " - " : "") + a.name,
+                type: a.category,
+                priority: priorityForDate(a.dueDate)
+            };
+        });
+    } catch (e) {
+        document.getElementById("reminder-list").innerHTML =
+            '<p class="subtext">Couldn\'t load your reminders. Please refresh.</p>';
+        return;
+    }
+    renderReminders();
+}
+
+window.showForm = showForm;
+window.hideForm = hideForm;
+window.addReminder = addReminder;
+window.deleteReminder = deleteReminder;
+window.editReminder = editReminder;
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();

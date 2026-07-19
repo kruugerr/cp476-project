@@ -77,3 +77,41 @@ export async function getCurrentUser() {
     gpaScale: scale,
   };
 }
+
+// --------------------------------------------------------------------------- //
+// Profile (Settings page)                                                      //
+// --------------------------------------------------------------------------- //
+// GET /user/:id/profile returns the user's row (snake_case, no password).
+// Translated here into the camelCase shape settings.js expects.
+export async function getProfile() {
+  const stored = getUser() || {};
+  const id = stored.user_id;
+  if (!id) throw new Error("No logged-in user");
+  const row = await apiGet(`/user/${id}/profile`);
+  return {
+    id: row.user_id,
+    firstName: row.first_name || "",
+    lastName: row.last_name || "",
+    email: row.email || "",
+    institution: row.institution || "",
+    gpaScale: Number(row.preferred_gpa_scale) || 4.0,
+    themeMode: row.theme_mode || "light",
+    reminderDays: row.default_reminder_days ?? 1,
+    reminderMethod: row.default_reminder_method || "Email",
+  };
+}
+
+// PUT /user/:id/profile expects { profile: {...snake_case fields...} }.
+// Only the columns the backend allows are sent.
+export async function updateProfile(patch) {
+  const stored = getUser() || {};
+  const id = stored.user_id;
+  if (!id) throw new Error("No logged-in user");
+  const res = await fetch(`${API_BASE}/user/${id}/profile`, {
+    method: "PUT",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ profile: patch }),
+  });
+  if (!res.ok) throw new Error(`Save failed (${res.status})`);
+  return res.json();
+}

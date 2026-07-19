@@ -1,14 +1,7 @@
-let events = [
-    { date: "2026-06-18", title: "Computer Networks - Assignment 1", type: "assignment" },
-    { date: "2026-06-22", title: "Lab - CP317", type: "lab" },
-    { date: "2026-06-25", title: "ML Midterm", type: "exam" },
-    { date: "2026-06-26", title: "AI Ethics Paper Due", type: "assignment" },
-    { date: "2026-06-28", title: "Database Quiz Reminder", type: "reminder" },
-    { date: "2026-06-30", title: "Algorithms Lab", type: "lab" },
-    { date: "2026-07-03", title: "Final Project Proposal", type: "assignment" },
-    { date: "2026-07-08", title: "Stats Exam", type: "exam" },
-    { date: "", title: "Group Presentation (date TBD)", type: "assignment" }
-];
+import { getActivities, getCourses } from "./api.js";
+import { requireAuth } from "./auth.js";
+
+let events = [];
 
 let monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
@@ -17,6 +10,8 @@ let today = new Date();
 let viewYear = today.getFullYear();
 let viewMonth = today.getMonth();
 let currentView = "month";
+
+let typeMap = { Assignment: "assignment", Project: "assignment", Quiz: "exam", Exam: "exam" };
 
 function activeTypes() {
     let types = [];
@@ -200,7 +195,7 @@ function renderWarning() {
     }
 
     box.classList.remove("hide");
-    box.innerHTML = "Warning: " + missing.length + " item is missing a due date - " + missing[0].title;
+    box.innerHTML = "Warning: " + missing.length + " item" + (missing.length > 1 ? "s are" : " is") + " missing a due date.";
 }
 
 function render() {
@@ -237,4 +232,33 @@ function dayLabel(d) {
     return names[d.getDay()] + " " + monthNames[d.getMonth()].slice(0, 3) + " " + d.getDate();
 }
 
-render();
+async function init() {
+    if (!requireAuth()) return;
+    try {
+        let [activities, courses] = await Promise.all([getActivities(), getCourses()]);
+        let codeById = {};
+        for (let c of courses) codeById[c.id] = c.code;
+
+        events = activities.map(function (a) {
+            let code = codeById[a.courseId] || "";
+            return {
+                date: a.dueDate ? String(a.dueDate).slice(0, 10) : "",
+                title: (code ? code + " - " : "") + a.name,
+                type: typeMap[a.category] || "assignment"
+            };
+        });
+    } catch (e) {
+        let box = document.getElementById("warning-box");
+        box.classList.remove("hide");
+        box.innerHTML = "Couldn't load your calendar. Please refresh.";
+    }
+    render();
+}
+
+window.setView = setView;
+window.prevMonth = prevMonth;
+window.nextMonth = nextMonth;
+window.render = render;
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();
