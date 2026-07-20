@@ -89,6 +89,7 @@ export const createActivity = (courseId, activityData, callback) => {
                 priority_level || "medium",
             ],
             (err, results) => {
+                db.release();
                 if (err) {
                     console.error("Error creating activity:", err);
                     return callback(err, null);
@@ -150,6 +151,52 @@ export const updateActivity = (activityId, userId, activityData, callback) => {
                     },
                 );
             });
+        });
+    });
+};
+
+// Removes one activity, from the delete button on an assignment card. Hard
+// delete — the schema has no soft-delete column, and nothing references
+// activities, so there's nothing to cascade. Calls back `true` when a row was
+// removed, `false` when there was nothing to remove.
+export const deleteActivity = (activityId, userId, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+
+        // Same join as updateActivity — activities has no user_id, so this is
+        // the only way to prove the row is the caller's before touching it.
+        const ownsQuery = `
+            SELECT a.activity_id
+            FROM activities a
+            JOIN courses c ON a.course_id = c.course_id
+            WHERE a.activity_id = ? AND c.user_id = ?
+        `;
+        db.query(ownsQuery, [activityId, userId], (err, rows) => {
+            if (err) {
+                db.release();
+                console.error("Error checking activity ownership:", err);
+                return callback(err, null);
+            }
+            if (rows.length === 0) {
+                db.release();
+                return callback(null, false); // missing, or not this user's
+            }
+
+            db.query(
+                `DELETE FROM activities WHERE activity_id = ?`,
+                [activityId],
+                (err) => {
+                    db.release();
+                    if (err) {
+                        console.error("Error deleting activity:", err);
+                        return callback(err, null);
+                    }
+                    callback(null, true);
+                },
+            );
         });
     });
 };
