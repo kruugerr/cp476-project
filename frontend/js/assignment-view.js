@@ -1,4 +1,4 @@
-import { getActivities, getCourses } from "./api.js";
+import { getActivities, getCourses, updateActivity } from "./api.js";
 
 const listEl = document.getElementById("assignmentList");
 const tabsEl = document.getElementById("sortTabs");
@@ -77,6 +77,7 @@ function cardHTML(a) {
       <input type="number" class="js-grade" data-id="${a.id}" value="${a.grade ?? ""}" placeholder="–" /> / 100
       <br /><br />
       <button class="js-update" data-id="${a.id}">Update grade</button>
+      <span class="js-msg" data-id="${a.id}" role="status"></span>
     </div>`;
 }
 
@@ -91,7 +92,21 @@ function render() {
   if (subtext) subtext.textContent = `${activities.length} total · ${overdue} overdue`;
 }
 
-const findById = (id) => activities.find((x) => x.id === id);
+const findById = (id) => activities.find((x) => String(x.id) === String(id));
+
+function showMessage(id, text, isError) {
+  const el = listEl.querySelector(`.js-msg[data-id="${id}"]`);
+  if (!el) return;
+  el.textContent = text;
+  el.className = `js-msg ${isError ? "is-error" : "is-ok"}`;
+}
+
+// Swap in the row the server stored and repaint.
+function applyUpdate(saved) {
+  const i = activities.findIndex((x) => String(x.id) === String(saved.id));
+  if (i !== -1) activities[i] = saved;
+  render();
+}
 
 tabsEl.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-sort]");
@@ -101,33 +116,65 @@ tabsEl.addEventListener("click", (e) => {
   render();
 });
 
-listEl.addEventListener("change", (e) => {
+listEl.addEventListener("change", async (e) => {
   const sel = e.target.closest(".js-status");
   if (!sel) return;
   const a = findById(sel.dataset.id);
   if (!a) return;
-  a.status = sel.value;
-  render();
+
+  const id = a.id;
+  sel.disabled = true;
+  try {
+    applyUpdate(await updateActivity(id, { grade: a.grade, status: sel.value }));
+    showMessage(id, "Status saved.", false);
+  } catch (err) {
+    render(); 
+    showMessage(id, err.message, true);
+  }
 });
 
-listEl.addEventListener("click", (e) => {
+listEl.addEventListener("click", async (e) => {
   const btn = e.target.closest(".js-update");
   if (!btn) return;
   const a = findById(btn.dataset.id);
   const input = listEl.querySelector(`.js-grade[data-id="${btn.dataset.id}"]`);
   if (!a || !input) return;
-  if (input.value.trim() === "") {
-    alert("Missing assignment grade.");
+
+  const id = a.id;
+  const raw = input.value.trim();
+  if (raw === "") {
+    showMessage(id, "Enter a grade first.", true);
     return;
   }
-  a.grade = Number(input.value);
-  render();
-  alert("Grade updated.");
+  const grade = Number(raw);
+  if (!Number.isFinite(grade) || grade < 0 || grade > 100) {
+    showMessage(id, "Grade must be between 0 and 100.", true);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  try {
+    // Recording a grade implies the work is graded, unless it's already
+    // further along in a way the dropdown captured.
+    applyUpdate(await updateActivity(id, { grade, status: "graded" }));
+    showMessage(id, "Grade saved.", false);
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = "Update grade";
+    showMessage(id, err.message, true);
+  }
 });
 
 (async function init() {
-  const [acts, courses] = await Promise.all([getActivities(), getCourses()]);
-  activities = acts;
-  coursesById = Object.fromEntries(courses.map((c) => [c.id, c]));
-  render();
+  try {
+    const [acts, courses] = await Promise.all([getActivities(), getCourses()]);
+    activities = acts;
+    coursesById = Object.fromEntries(courses.map((c) => [c.id, c]));
+    render();
+  } catch (e) {
+    listEl.innerHTML =
+      `<p class="subtext">Couldn't load your assignments — your session may have expired. ` +
+      `<a href="login.html">Log in again</a>.</p>`;
+  }
 })();

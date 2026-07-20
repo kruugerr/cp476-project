@@ -23,6 +23,9 @@ router.get(
     userController.getActivitiesByUserIdAndCourseId,
 );
 
+// Recording a grade from the assignments page.
+router.put("/activities/:activityId", userController.updateActivityById);
+
 // Upload syllabus routes + add course and activity routes.
 const uploadPdf = (req, res, next) => {
     upload.single("file")(req, res, (err) => {

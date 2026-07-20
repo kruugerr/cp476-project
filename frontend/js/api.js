@@ -24,6 +24,12 @@ function pickCurrentTerm(rawCourses) {
 // Fetch courses + activities once and derive everything. Cached as a promise so
 // concurrent getters share a single round-trip per page load.
 let _dataPromise = null;
+
+// Drop the cache after a write, so the dashboard and GPA tracker pick up the new grade on their next visit
+export function invalidateData() {
+  _dataPromise = null;
+}
+
 function loadData() {
   if (_dataPromise) return _dataPromise;
   _dataPromise = (async () => {
@@ -61,6 +67,23 @@ export async function getActivities() {
 export async function getSemester() {
   const { currentTerm } = await loadData();
   return { term: currentTerm };
+}
+
+// PUT /user/activities/:id — record a grade from the assignments page.
+// Returns the stored row, not the values we sent, since the backend
+// normalizes them.
+export async function updateActivity(id, { grade, status }) {
+  const res = await fetch(`${API_BASE}/user/activities/${id}`, {
+    method: "PUT",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ activity: { grade, status } }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || `Save failed (${res.status})`);
+  }
+  invalidateData();
+  return adaptActivity(await res.json());
 }
 
 // Assembled from the user stored at login (auth.js) plus a computed GPA. Fields

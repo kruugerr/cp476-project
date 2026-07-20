@@ -70,6 +70,8 @@ CREATE TABLE activities (
     reminder_method ENUM('email', 'whatsapp') NOT NULL DEFAULT 'email',
     priority_level ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
     grade DECIMAL(5,2) NULL,
+    status ENUM('not_started', 'in_progress', 'submitted', 'graded')
+        NOT NULL DEFAULT 'not_started',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -88,6 +90,9 @@ CREATE TABLE activities (
     ),
     CONSTRAINT chk_activities_grade CHECK (
         grade IS NULL OR (grade >= 0.00 AND grade <= 100.00)
+    ),
+    CONSTRAINT chk_activities_status CHECK (
+        status IN ('not_started', 'in_progress', 'submitted', 'graded')
     ),
     CONSTRAINT fk_activities_course FOREIGN KEY (course_id)
         REFERENCES courses (course_id)

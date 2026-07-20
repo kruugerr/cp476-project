@@ -102,6 +102,58 @@ export const createActivity = (courseId, activityData, callback) => {
     });
 };
 
+// Records the grade / status on one activity. grade is a number 0-100, or
+// null to clear it.
+export const updateActivity = (activityId, userId, activityData, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+
+        const ownsQuery = `
+            SELECT a.activity_id
+            FROM activities a
+            JOIN courses c ON a.course_id = c.course_id
+            WHERE a.activity_id = ? AND c.user_id = ?
+        `;
+        db.query(ownsQuery, [activityId, userId], (err, rows) => {
+            if (err) {
+                db.release();
+                console.error("Error checking activity ownership:", err);
+                return callback(err, null);
+            }
+            if (rows.length === 0) {
+                db.release();
+                return callback(null, null); // missing, or not this user's
+            }
+
+            const { grade, status } = activityData;
+            const updateQuery = `UPDATE activities SET grade = ?, status = ? WHERE activity_id = ?`;
+            db.query(updateQuery, [grade, status, activityId], (err) => {
+                if (err) {
+                    db.release();
+                    console.error("Error updating activity:", err);
+                    return callback(err, null);
+                }
+
+                db.query(
+                    `SELECT * FROM activities WHERE activity_id = ?`,
+                    [activityId],
+                    (err, updated) => {
+                        db.release();
+                        if (err) {
+                            console.error("Error reloading activity:", err);
+                            return callback(err, null);
+                        }
+                        callback(null, updated[0]);
+                    },
+                );
+            });
+        });
+    });
+};
+
 // Aggregate counts for the dashboard's stat tiles — total courses,
 // total activities, how many are done vs pending (based on grade being
 // recorded), and how many are due soon.

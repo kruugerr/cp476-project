@@ -57,6 +57,55 @@ export const getActivitiesByUserIdAndCourseId = (req, res) => {
     );
 };
 
+// PUT /user/activities/:activityId
+const ACTIVITY_STATUSES = [
+    "not_started",
+    "in_progress",
+    "submitted",
+    "graded",
+];
+
+export const updateActivityById = (req, res) => {
+    const { activityId } = req.params;
+    const { activity } = req.body;
+
+    if (!activity) {
+        return res.status(400).json({ message: "Missing activity data" });
+    }
+
+    // Grade: null clears it, otherwise it has to be a number the DB will accept
+    let grade = null;
+    if (activity.grade !== null && activity.grade !== undefined && activity.grade !== "") {
+        grade = Number(activity.grade);
+        if (!Number.isFinite(grade) || grade < 0 || grade > 100) {
+            return res
+                .status(400)
+                .json({ message: "Grade must be a number between 0 and 100" });
+        }
+    }
+
+    // Status defaults to whatever the grade implies, so a client that only sends a grade still ends up consistent.
+    const status = activity.status ?? (grade != null ? "graded" : "not_started");
+    if (!ACTIVITY_STATUSES.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+    }
+
+    activityModel.updateActivity(
+        activityId,
+        req.user.user_id,
+        { grade, status },
+        (err, updated) => {
+            if (err)
+                return res
+                    .status(500)
+                    .json({ message: "Failed to update activity" });
+            if (!updated)
+                return res.status(404).json({ message: "Activity not found" });
+            res.json(updated);
+        },
+    );
+};
+
 // POST /user/upload-syllabus
 export const uploadSyllabus = async (req, res) => {
     if (!req.file) {

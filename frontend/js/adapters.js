@@ -32,7 +32,8 @@ export function adaptActivity(row) {
     weight: num(row.grading_weight) ?? 0,
     dueDate: row.due_date,
     grade,
-    status: grade != null ? "graded" : "not_started",
+    // activities.status is the stored value; fall back to deriving it from the grade for rows written before that column existed.
+    status: row.status || (grade != null ? "graded" : "not_started"),
   };
 }
 
