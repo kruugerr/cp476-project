@@ -64,6 +64,26 @@ export async function getActivities() {
   return activities;
 }
 
+// One course + its activities, for the course detail page. 
+export async function getCourse(id) {
+  const [row, rawActivities] = await Promise.all([
+    apiGet(`/user/courses/${id}`),
+    apiGet(`/user/courses/${id}/activities`),
+  ]);
+  const activities = rawActivities.map(adaptActivity);
+
+  // adaptCourse's index only picks the palette colour — look up this course's
+  // position in the full list so the detail page matches its card on the grid.
+  let index = 0;
+  try {
+    const all = await getCourses();
+    const i = all.findIndex((c) => String(c.id) === String(id));
+    if (i >= 0) index = i;
+  } catch { /* colour is cosmetic; fall back to the first palette entry */ }
+
+  return { course: adaptCourse(row, index, activities), raw: row, activities };
+}
+
 export async function getSemester() {
   const { currentTerm } = await loadData();
   return { term: currentTerm };

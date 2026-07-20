@@ -1,4 +1,5 @@
 import { getActivities, getCourses, updateActivity } from "./api.js";
+import { getParam } from "./url.js";
 
 const listEl = document.getElementById("assignmentList");
 const tabsEl = document.getElementById("sortTabs");
@@ -69,6 +70,12 @@ function populateFilters() {
       Object.values(coursesById)
         .map((c) => `<option value="${c.id}">${c.code} — ${c.name}</option>`)
         .join("");
+
+    const wanted = getParam("course");
+    if (wanted && coursesById[wanted]) {
+      filters.courseId = wanted;
+      courseSel.value = wanted;
+    }
   }
   if (statusSel) {
     statusSel.innerHTML =

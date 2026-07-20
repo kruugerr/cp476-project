@@ -33,109 +33,56 @@
       <div data-include="../partials/topbar.html"></div>
 
       <main class="app-content">
+        <!-- Two modes, both driven by js/course.js:
+             no ?id  -> #courseGrid, every course as a card
+             ?id=N   -> #courseDetail, that one course.
+             Everything below is an empty shell; the page fills it from the API. -->
         <div class="page">
-          <div class="course-top">
-            <div class="course-title-row">
-              <div>
-                <h1>Introduction to Algorithms</h1>
-                <p>Professor: Dr. Sarah Kim</p>
-                <p>Office Hours: Monday and Wednesday 2PM - 4PM</p>
-                <p>Textbook: Introduction to Algorithms</p>
+          <p class="page-eyebrow" id="courseEyebrow">Courses</p>
+
+          <!-- grid mode -->
+          <section id="courseGrid" hidden>
+            <h1>Your Courses</h1>
+            <p class="subtext" id="courseGridSub"></p>
+            <div class="dash-courses" id="courseCards"></div>
+          </section>
+
+          <!-- detail mode -->
+          <section id="courseDetail" hidden>
+            <div class="course-top">
+              <div class="course-title-row">
+                <div id="courseHeader"></div>
+
+                <div class="course-grade-cell">
+                  <p>Current Grade</p>
+                  <div id="courseGrade" class="current-grade">—</div>
+                </div>
               </div>
 
-              <div>
-                <p>Current Grade</p>
-                <div id="grade" class="current-grade">87%</div>
+              <div class="course-progress-bg">
+                <div id="courseBar" class="course-progress-fill"></div>
               </div>
             </div>
 
-            <div class="course-progress-bg">
-              <div id="bar" class="course-progress-fill"></div>
+            <div class="course-grid">
+              <div class="card">
+                <h2>Grade Breakdown</h2>
+                <div id="courseBreakdown"></div>
+              </div>
+
+              <div class="card">
+                <h2>Assignments</h2>
+                <div id="courseAssignments"></div>
+              </div>
             </div>
-          </div>
+          </section>
 
-          <div class="course-grid">
-            <div class="card">
-              <h2>Grade Breakdown</h2>
-              <p>Assignments: 30%</p>
-              <p>Labs: 15%</p>
-              <p>Quizzes: 15%</p>
-              <p>Midterm: 20%</p>
-              <p>Final Exam: 20%</p>
-              <button onclick="updateGrade()">Update Grade</button>
-            </div>
-
-            <div class="card">
-              <h2>Assignments</h2>
-
-              <table class="assignment-table">
-                <tr>
-                  <th>Assignment</th>
-                  <th>Type</th>
-                  <th>Due Date</th>
-                  <th>Weight</th>
-                  <th>Status</th>
-                  <th>Grade</th>
-                </tr>
-
-                <tr>
-                  <td>
-                    <a href="assignments-view.html"
-                      >Assignment 1 - Sorting Algorithms</a
-                    >
-                  </td>
-                  <td>Assignment</td>
-                  <td>Nov 14, 2026</td>
-                  <td>6%</td>
-                  <td><span class="status overdue">Overdue</span></td>
-                  <td>- / 100</td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <a href="assignments-view.html"
-                      >Assignment 2 - Graph Traversal</a
-                    >
-                  </td>
-                  <td>Assignment</td>
-                  <td>Dec 2, 2026</td>
-                  <td>7%</td>
-                  <td><span class="status in-progress">In Progress</span></td>
-                  <td>- / 100</td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <a href="assignments-view.html"
-                      >Assignment 3 - Dynamic Programming</a
-                    >
-                  </td>
-                  <td>Assignment</td>
-                  <td>Dec 13, 2026</td>
-                  <td>7%</td>
-                  <td><span class="status not-started">Not Started</span></td>
-                  <td>- / 100</td>
-                </tr>
-
-                <tr>
-                  <td><a href="assignments-view.html">Midterm Exam</a></td>
-                  <td>Exam</td>
-                  <td>Feb 27, 2026</td>
-                  <td>20%</td>
-                  <td><span class="status graded">Graded</span></td>
-                  <td>88 / 100</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-
-          <div class="warning">
-            Warning: Missing course data will appear here.
-          </div>
+          <!-- empty / error / loading messages -->
+          <div id="courseMsg"></div>
         </div>
       </main>
     </div>
     <script type="module" src="../js/include.js"></script>
-    <script src="../js/course.js"></script>
+    <script type="module" src="../js/course.js"></script>
   </body>
 </html>

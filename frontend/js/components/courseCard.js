@@ -1,7 +1,8 @@
 import { progressBar } from './progressBar.js';
+import { paramLink } from '../url.js';
 export function courseCard(c) {
   return `
-    <a class="ccard" href="courses.html" style="--c:var(--course-${c.color})">
+    <a class="ccard" href="${paramLink('courses.html', 'id', c.id)}" style="--c:var(--course-${c.color})">
       <span class="ccard__accent"></span>
       <div class="ccard__head">
         <span class="ccard__code">${c.code}</span>
