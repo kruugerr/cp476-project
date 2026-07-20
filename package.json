@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "@anthropic-ai/sdk": "^0.112.3",
+        "google-auth-library": "^10.9.0",
         "serve": "^14.2.4"
     }
 }
