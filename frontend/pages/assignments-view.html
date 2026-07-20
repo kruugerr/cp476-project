@@ -41,19 +41,16 @@
           <div class="filters">
             <input
               type="text"
+              id="filterSearch"
               placeholder="Search assignments…"
               style="flex: 1; min-width: 180px"
             />
-            <select>
-              <option>All Courses</option>
-              <option>CS301</option>
-              <option>MATH201</option>
+            <!-- Both selects are populated from real data in assignment-view.js. -->
+            <select id="filterCourse">
+              <option value="">All Courses</option>
             </select>
-            <select>
-              <option>All Status</option>
-              <option>Not Started</option>
-              <option>In Progress</option>
-              <option>Graded</option>
+            <select id="filterStatus">
+              <option value="">All Status</option>
             </select>
             <button class="btn">+ Add assignment</button>
           </div>

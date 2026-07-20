@@ -5,25 +5,23 @@ const tabsEl = document.getElementById("sortTabs");
 
 let activities = [];
 let coursesById = {};
-let sortMode = "due"; 
+let sortMode = "due";
+const filters = { q: "", courseId: "", status: "" };
 
-const STATUS_LABEL = {
-  not_started: "Not Started", in_progress: "In Progress",
-  graded: "Graded", submitted: "Submitted", completed: "Completed",
-};
-// reuse the existing pill classes from app-pages.css
-const STATUS_CLASS = {
-  not_started: "not-started", in_progress: "in-progress",
-  graded: "graded", submitted: "graded", completed: "graded",
-};
-// options shown in each card's Status dropdown
+// These four are the only values activities.status accepts.
 const STATUS_OPTIONS = [
   ["not_started", "Not Started"],
   ["in_progress", "In Progress"],
-  ["completed", "Completed"],
   ["submitted", "Submitted"],
   ["graded", "Graded"],
 ];
+
+const STATUS_LABEL = Object.fromEntries(STATUS_OPTIONS);
+// reuse the existing pill classes from app-pages.css
+const STATUS_CLASS = {
+  not_started: "not-started", in_progress: "in-progress",
+  graded: "graded", submitted: "graded",
+};
 
 const DAY = 86400000;
 const fmtDate = (iso) =>
@@ -39,12 +37,44 @@ function priorityScore(a) {
   return score;
 }
 
+// Narrow to what the filter bar asks for. Empty string = "no filter", which is what the "All …" options carry as their value.
+function filtered() {
+  const q = filters.q.trim().toLowerCase();
+  return activities.filter((a) => {
+    if (filters.courseId && String(a.courseId) !== filters.courseId) return false;
+    if (filters.status && a.status !== filters.status) return false;
+    if (q) {
+      const code = coursesById[a.courseId]?.code ?? "";
+      if (!`${a.name} ${code}`.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+}
+
 function sorted() {
-  const arr = [...activities];
+  const arr = filtered();
   if (sortMode === "due")      arr.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
   if (sortMode === "weight")   arr.sort((a, b) => b.weight - a.weight);
   if (sortMode === "priority") arr.sort((a, b) => priorityScore(b) - priorityScore(a));
   return arr;
+}
+
+// The course list comes from the user's actual courses; the status list from STATUS_OPTIONS, so it can't drift from what the backend accepts.
+function populateFilters() {
+  const courseSel = document.getElementById("filterCourse");
+  const statusSel = document.getElementById("filterStatus");
+  if (courseSel) {
+    courseSel.innerHTML =
+      `<option value="">All Courses</option>` +
+      Object.values(coursesById)
+        .map((c) => `<option value="${c.id}">${c.code} — ${c.name}</option>`)
+        .join("");
+  }
+  if (statusSel) {
+    statusSel.innerHTML =
+      `<option value="">All Status</option>` +
+      STATUS_OPTIONS.map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+  }
 }
 
 function statusSelect(a) {
@@ -82,14 +112,23 @@ function cardHTML(a) {
 }
 
 function render() {
-  listEl.innerHTML = sorted().map(cardHTML).join("");
+  const shown = sorted();
+  listEl.innerHTML = shown.length
+    ? shown.map(cardHTML).join("")
+    : `<p class="subtext">No assignments match these filters.</p>`;
 
-  const overdue = activities.filter(
+  // Counts describe what's on screen, so they stay honest while filtering.
+  const overdue = shown.filter(
     (a) => new Date(a.dueDate) < Date.now() &&
            a.status !== "graded" && a.status !== "submitted"
   ).length;
+  const isFiltered = shown.length !== activities.length;
   const subtext = document.querySelector(".subtext");
-  if (subtext) subtext.textContent = `${activities.length} total · ${overdue} overdue`;
+  if (subtext) {
+    subtext.textContent = isFiltered
+      ? `${shown.length} of ${activities.length} · ${overdue} overdue`
+      : `${activities.length} total · ${overdue} overdue`;
+  }
 }
 
 const findById = (id) => activities.find((x) => String(x.id) === String(id));
@@ -107,6 +146,19 @@ function applyUpdate(saved) {
   if (i !== -1) activities[i] = saved;
   render();
 }
+
+document.getElementById("filterSearch")?.addEventListener("input", (e) => {
+  filters.q = e.target.value;
+  render();
+});
+document.getElementById("filterCourse")?.addEventListener("change", (e) => {
+  filters.courseId = e.target.value;
+  render();
+});
+document.getElementById("filterStatus")?.addEventListener("change", (e) => {
+  filters.status = e.target.value;
+  render();
+});
 
 tabsEl.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-sort]");
@@ -171,6 +223,7 @@ listEl.addEventListener("click", async (e) => {
     const [acts, courses] = await Promise.all([getActivities(), getCourses()]);
     activities = acts;
     coursesById = Object.fromEntries(courses.map((c) => [c.id, c]));
+    populateFilters();
     render();
   } catch (e) {
     listEl.innerHTML =
