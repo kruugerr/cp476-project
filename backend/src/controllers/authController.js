@@ -22,12 +22,17 @@ const JWT_SECRET = getJWTSecret();
 // it into a one-way hash before it touches the database.
 
 export const userRegister = async (req, res) => {
-    // console.log("Received registration request:", req.body);
+    console.log("Received registration request:", req.body);
     try {
-        const { first_name, last_name, email, password, role } = req.body;
+        const { first_name, last_name, email, password } = req.body;
+        const role = "student"; // Default role to "student"
 
         if (!first_name || !last_name || !email || !password) {
             return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+            return res.status(400).json({ message: "Invalid email format" });
         }
 
         getUserByEmail(email, async (err, existingUser) => {
@@ -75,6 +80,10 @@ export const userRegisterOAuth = async (req, res) => {
         const first_name = googleUser.given_name;
         const last_name = googleUser.family_name;
         const email = googleUser.email;
+
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+            return res.status(400).json({ message: "Invalid email format" });
+        }
 
         getUserByEmail(email, async (err, existingUser) => {
             if (err) return res.status(500).json({ message: "Server error" });
