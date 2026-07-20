@@ -150,3 +150,13 @@ async function handleCredentialResponse(response) {
         oauthError.textContent = error.message;
     }
 }
+
+const show = document.getElementById("showPassword");
+
+show.addEventListener("change", function () {
+    if (this.checked) {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+});

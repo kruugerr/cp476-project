@@ -176,3 +176,15 @@ async function handleCredentialResponse(response) {
         alert(error.message || "Google signup failed.");
     }
 }
+
+const show = document.getElementById("showPassword");
+
+show.addEventListener("change", function () {
+    if (this.checked) {
+        password.type = "text";
+        confirmPassword.type = "text";
+    } else {
+        password.type = "password";
+        confirmPassword.type = "password";
+    }
+});
