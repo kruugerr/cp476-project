@@ -1,7 +1,17 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
+import nodemailer from "nodemailer";
 import { createToken, getJWTSecret } from "../middleware/auth.js";
-import { createUser, getUserByEmail } from "../model/userModel.js";
+import {
+    createPasswordResetToken,
+    createUser,
+    deletePasswordResetToken,
+    getPasswordResetWithToken,
+    getPasswordResetWithUserID,
+    getUserByEmail,
+    updateUserPassword,
+} from "../model/userModel.js";
 
 const JWT_SECRET = getJWTSecret();
 
@@ -142,13 +152,111 @@ export const userLoginOAuth = async (req, res) => {
 };
 
 export const userResetPassword = (req, res) => {
-    const { email, newPassword } = req.body;
-    console.log("Received password reset request for:", email);
-    newPassword = bcrypt.hash(newPassword, 10);
+    const token = req.params.token;
+    const password = req.body.password;
+    console.log("Received token:", token);
+    getPasswordResetWithToken(token, (err, tokenRecord) => {
+        if (err || !tokenRecord) {
+            return res
+                .status(400)
+                .json({ message: "Invalid or expired token" });
+        }
+        if (new Date(tokenRecord.expires_at) < new Date()) {
+            return res
+                .status(400)
+                .json({ message: "Invalid or expired token" });
+        }
+        if (!password) {
+            return res.status(400).json({ message: "Password is required" });
+        }
+        const passwordHash = bcrypt.hashSync(password, 10);
+        updateUserPassword(tokenRecord.user_id, passwordHash, (err) => {
+            if (err) {
+                return res.status(500).json({
+                    message: "Failed to reset password. Please try again.",
+                });
+            }
+            deletePasswordResetToken(token, (err) => {
+                if (err) {
+                    console.error("Error deleting password reset token:", err);
+                }
+            });
+            res.status(200).json({ message: "Password reset successful" });
+        });
+    });
 };
 
 export const userForgotPassword = (req, res) => {
     const { email } = req.body;
-    console.log("Received email for password reset:", email);
-    // TODO: send reset link — Phase 4 territory, not blocking right now
+    getUserByEmail(email, (err, user) => {
+        if (err || !user) {
+            // For security reasons, we don't reveal whether the email exists or not
+            return;
+        }
+        getPasswordResetWithUserID(user.user_id, (err, tokenRecord) => {
+            if (err) {
+                console.error(
+                    "Error checking existing password reset token:",
+                    err,
+                );
+                return;
+            }
+            if (user) {
+                if (tokenRecord) {
+                    if (
+                        new Date(tokenRecord.expires_at) > new Date(Date.now())
+                    ) {
+                        console.log(
+                            "Password reset token already exists and is valid.",
+                        );
+                        return;
+                    } else {
+                        deletePasswordResetToken(tokenRecord.token, (err) => {
+                            if (err) {
+                                console.error(
+                                    "Error deleting old password reset token:",
+                                    err,
+                                );
+                                return;
+                            }
+                        });
+                    }
+                }
+                const token = crypto.randomBytes(64).toString("hex");
+                const expiresAt = new Date(Date.now() + 1800000); // 0.5 hour from now
+                createPasswordResetToken(
+                    user.user_id,
+                    token,
+                    expiresAt,
+                    (err) => {
+                        if (err) {
+                            console.error(
+                                "Error inserting new password reset token:",
+                                err,
+                            );
+                            return;
+                        }
+                        sendResetPasswordMail(token, email);
+                    },
+                );
+            }
+        });
+    });
+};
+
+export const sendResetPasswordMail = (token, email) => {
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.APP_EMAIL,
+            pass: process.env.APP_EMAIL_PASSWORD,
+        },
+    });
+    transporter.sendMail({
+        from: process.env.APP_EMAIL,
+        to: email,
+        subject: "Password Reset Request",
+        text: `You requested a password reset. Use the following links to reset your password: ${process.env.FRONTEND_URL}/pages/reset-password?token=${token}. This token will expire in 30 minutes.`,
+    });
+    console.log(`Password reset email sent to ${email} with token: ${token}`);
 };

@@ -156,3 +156,84 @@ export const updateUserPassword = (userId, newPasswordHash, callback) => {
         });
     });
 };
+
+export const getPasswordResetWithToken = (token, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+        db.query(
+            "SELECT * FROM password_reset_tokens WHERE token = ?",
+            [token],
+            (err, results) => {
+                if (err) {
+                    console.error("Error fetching password reset token:", err);
+                    return callback(err, null);
+                }
+                callback(null, results[0]);
+            },
+        );
+    });
+};
+
+export const getPasswordResetWithUserID = (userID, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+        db.query(
+            "SELECT * FROM password_reset_tokens WHERE user_id = ?",
+            [userID],
+            (err, results) => {
+                if (err) {
+                    console.error("Error fetching password reset token:", err);
+                    return callback(err, null);
+                }
+                callback(null, results[0]);
+            },
+        );
+    });
+};
+
+export const deletePasswordResetToken = (token, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+
+        db.query(
+            "DELETE FROM password_reset_tokens WHERE token = ?",
+            [token],
+            (err, results) => {
+                if (err) {
+                    console.error("Error deleting password reset token:", err);
+                    return callback(err, null);
+                }
+                callback(null, results);
+            },
+        );
+    });
+};
+
+export const createPasswordResetToken = (userID, token, expiresAt, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+        db.query(
+            "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
+            [userID, token, expiresAt],
+            (err, results) => {
+                if (err) {
+                    console.error("Error creating password reset token:", err);
+                    return callback(err, null);
+                }
+                callback(null, results);
+            },
+        );
+    });
+};
