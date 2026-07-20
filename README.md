@@ -12,14 +12,14 @@ This app lets students upload a course syllabus and have it automatically parsed
 
 ## Features
 
-* AI-powered syllabus ingestion through PDF upload or pasted text
-* Semester dashboard with calendar and weekly views
-* Course view with grade tracking
-* Assignment/activity tracker with due dates, grading weights, status, hours logged, and grades
-* GPA tracker using both 4.0 and 12.0 scales
-* Reminder settings through email or WhatsApp
-* Teacher course publishing with join codes
-* Student enrollment flow
+- AI-powered syllabus ingestion through PDF upload or pasted text
+- Semester dashboard with calendar and weekly views
+- Course view with grade tracking
+- Assignment/activity tracker with due dates, grading weights, status, hours logged, and grades
+- GPA tracker using both 4.0 and 12.0 scales
+- Reminder settings through email or WhatsApp
+- Teacher course publishing with join codes
+- Student enrollment flow
 
 ---
 
@@ -43,8 +43,8 @@ This app lets students upload a course syllabus and have it automatically parsed
 
 To view the front-end, you only need **one** of:
 
-* **Python 3** — preinstalled on macOS/Linux (recommended, nothing to install), **or**
-* **Node.js + npm** — if you prefer the `npx serve` option below
+- **Python 3** — preinstalled on macOS/Linux (recommended, nothing to install), **or**
+- **Node.js + npm** — if you prefer the `npx serve` option below
 
 Plus **Git** to clone the repo. (Node.js and PostgreSQL are only needed for the
 optional back-end/database, which are still in progress.)
@@ -53,6 +53,21 @@ optional back-end/database, which are still in progress.)
 
 ## How to Run Locally
 
+**Both servers must be running, on these exact ports:**
+
+| Part      | Port   |
+| --------- | ------ |
+| Front-end | `3000` |
+| Back-end  | `5000` |
+
+Changing either port breaks the app.
+
+### Prerequisites
+
+- **Node.js 18+** and npm
+
+That's all — the database is hosted, so there's nothing to install or create.
+
 ### 1. Clone the Repository
 
 ```bash
@@ -60,30 +75,53 @@ git clone https://github.com/kruugerr/cp476-project.git
 cd cp476-project
 ```
 
----
+### 2. Add the Environment File
 
-### 2. Run the Front-End
+The app needs `backend/.env`, which holds the database credentials, JWT
+secret, and Claude API key. It is **not** in this repository — it has been submitted
+separately alongside the project.
 
-For milestone 02, the app runs entirely on the front-end with built-in mock data (no back-end or database required).
+Copy the provided `.env` file into the `backend/` folder:
 
-From the `frontend/` folder, start a local web server on port 5500:
+```
+cp476-project/
+└── backend/
+    └── .env        <- (place it here)
+```
 
-**Option A — Python 3
+The back-end will not start without it.
 
-bash
-cd frontend
-python3 -m http.server 5500
+### 3. Install Back-End Dependencies
 
-Option B — Node.js:
+```bash
+cd backend
+npm install
+```
 
-cd frontend
-npx serve -l 5500
+The front-end has no dependencies and needs no install step.
 
-Then open http://localhost:5500 in your browser
+### 4. Start Both Servers
 
-(Open it through the local server above, do not double-click the HTML files. 
-The pages load shared parts (sidebar, top bar) with fetch(), which browsers block on 
-file://. Serving over http:// is what makes the app work.)
+Open **two terminals**, both from the project root.
+
+**Terminal 1 — back-end API (port 5000):**
+
+```bash
+cd backend
+npm run dev
+```
+
+Wait for `Database connection successful.` and
+`Server running on http://localhost:5000`. If the database line doesn't
+appear, check that `.env` is in the right place.
+
+**Terminal 2 — front-end (port 3000):**
+
+```bash
+npx serve frontend -l 3000
+```
+
+Then open **http://localhost:3000**
 
 ---
 
@@ -107,13 +145,13 @@ The activity blog/wiki is maintained in the project documentation and includes w
 
 ## Team Member Contributions
 
-| Name          | Contribution Summary                                                                    |
-| ------------- | --------------------------------------------------------------------------------------- |
-| Zach Gould    | Worked on project setup, GitHub repository organization, and development tasks.         |
-| Zohra Haidary | Worked on planning documentation, front-end/design tasks, and project organization.     |
-| Tyler Rizzi   | Worked on back-end setup, README updates, and project documentation. |
-| Thanh Phan    | Worked on development tasks, milestone planning, and implementation support.            |
-| Qichen Hao    | Worked on planning, project documentation, and implementation support.                  |
+| Name          | Contribution Summary                                                                |
+| ------------- | ----------------------------------------------------------------------------------- |
+| Zach Gould    | Worked on project setup, GitHub repository organization, and development tasks.     |
+| Zohra Haidary | Worked on planning documentation, front-end/design tasks, and project organization. |
+| Tyler Rizzi   | Worked on back-end setup, README updates, and project documentation.                |
+| Thanh Phan    | Worked on development tasks, milestone planning, and implementation support.        |
+| Qichen Hao    | Worked on planning, project documentation, and implementation support.              |
 
 ---
 

@@ -4,6 +4,7 @@ import * as userModel from "../model/userModel.js";
 import { extractSyllabus } from "../services/extractor.js";
 import {
     normalizeExtraction,
+    validateActivityPayload,
     validateCoursePayload,
 } from "../services/syllabusNormalizer.js";
 
@@ -106,6 +107,27 @@ export const updateActivityById = (req, res) => {
     );
 };
 
+// DELETE /user/activities/:activityId
+// Removing an assignment from the assignments page. 404 covers both "no such
+// activity" and "not yours" — the model doesn't distinguish, deliberately.
+export const deleteActivityById = (req, res) => {
+    const { activityId } = req.params;
+
+    activityModel.deleteActivity(
+        activityId,
+        req.user.user_id,
+        (err, deleted) => {
+            if (err)
+                return res
+                    .status(500)
+                    .json({ message: "Failed to delete activity" });
+            if (!deleted)
+                return res.status(404).json({ message: "Assignment not found" });
+            res.status(204).end();
+        },
+    );
+};
+
 // POST /user/upload-syllabus
 export const uploadSyllabus = async (req, res) => {
     if (!req.file) {
@@ -195,6 +217,64 @@ export const addCourse = (req, res) => {
                     }
                 },
             );
+        });
+    });
+};
+
+// POST /user/activities
+// Adds a single assignment to a course the student already has — the manual
+// counterpart to the syllabus flow, driven by the Add assignment modal on the
+// assignments page.
+export const addActivity = (req, res) => {
+    const { activity } = req.body;
+    if (!activity) {
+        return res.status(400).json({ message: "Missing activity data" });
+    }
+
+    const courseId = Number(activity.course_id);
+    if (!Number.isInteger(courseId) || courseId <= 0) {
+        return res.status(400).json({
+            message: "Invalid activity data",
+            errors: ["course_id is required"],
+        });
+    }
+
+    const { ok, errors, normalized } = validateActivityPayload(activity);
+    if (!ok) {
+        return res.status(400).json({ message: "Invalid activity data", errors });
+    }
+
+    // activities has no user_id — ownership only exists through the course, and
+    // createActivity doesn't check it. Without this any logged-in user could
+    // insert into someone else's course by guessing a course_id.
+    courseModel.getCourseById(courseId, req.user.user_id, (err, course) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        if (!course)
+            return res.status(404).json({ message: "Course not found" });
+
+        activityModel.createActivity(courseId, normalized, (err, created) => {
+            if (err) {
+                // UNIQUE (course_id, activity_name, due_date) — adding the same
+                // assignment twice is a client mistake, not a server fault.
+                if (err.code === "ER_DUP_ENTRY") {
+                    return res.status(409).json({
+                        message:
+                            "That assignment already exists for this course on that due date.",
+                    });
+                }
+                return res
+                    .status(500)
+                    .json({ message: "Failed to create activity" });
+            }
+
+            // createActivity echoes back what it was given, so fill in the
+            // columns the DB defaulted — the client adapts this straight into a card.
+            res.status(201).json({
+                ...created,
+                course_id: courseId,
+                grade: null,
+                status: "not_started",
+            });
         });
     });
 };

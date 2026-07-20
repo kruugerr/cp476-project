@@ -1,4 +1,11 @@
-import { getActivities, getCourses, updateActivity } from "./api.js";
+import {
+  createActivity,
+  deleteActivity,
+  getActivities,
+  getCourses,
+  updateActivity,
+} from "./api.js";
+import { CATEGORY_ID_TO_NAME } from "./adapters.js";
 import { getParam } from "./url.js";
 
 const listEl = document.getElementById("assignmentList");
@@ -114,6 +121,7 @@ function cardHTML(a) {
       <input type="number" class="js-grade" data-id="${a.id}" value="${a.grade ?? ""}" placeholder="–" /> / 100
       <br /><br />
       <button class="js-update" data-id="${a.id}">Update grade</button>
+      <button class="js-delete btn-danger" data-id="${a.id}">Delete</button>
       <span class="js-msg" data-id="${a.id}" role="status"></span>
     </div>`;
 }
@@ -225,12 +233,182 @@ listEl.addEventListener("click", async (e) => {
   }
 });
 
+listEl.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".js-delete");
+  if (!btn) return;
+  const a = findById(btn.dataset.id);
+  if (!a) return;
+
+  // Hard delete with no undo, so make sure it was intended. Native confirm
+  // matches how settings.js gates account deletion.
+  if (!confirm(`Delete "${a.name}"? This can't be undone.`)) return;
+
+  const id = a.id;
+  btn.disabled = true;
+  btn.textContent = "Deleting…";
+  try {
+    await deleteActivity(id);
+    // Drop it locally and repaint — the card vanishing is the confirmation,
+    // and render() recomputes the total/overdue counts.
+    activities = activities.filter((x) => String(x.id) !== String(id));
+    render();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = "Delete";
+    showMessage(id, err.message, true);
+  }
+});
+
+// --------------------------------------------------------------------------- //
+// Add assignment modal                                                         //
+// --------------------------------------------------------------------------- //
+const modalEl = document.getElementById("addModal");
+const formEl = document.getElementById("addAssignmentForm");
+const formErrorEl = document.getElementById("formError");
+const saveBtn = document.getElementById("saveAssignment");
+
+const field = (id) => document.getElementById(id);
+
+// Same options the filter bar uses, minus the "All …" entry — a new assignment
+// has to belong to exactly one existing course.
+function populateFormOptions() {
+  const courseSel = field("a-course");
+  const categorySel = field("a-category");
+  if (courseSel) {
+    courseSel.innerHTML =
+      `<option value="">Select a course…</option>` +
+      Object.values(coursesById)
+        .map((c) => `<option value="${c.id}">${c.code} — ${c.name}</option>`)
+        .join("");
+    // Adding from a filtered view most likely means adding to that course.
+    if (filters.courseId) courseSel.value = filters.courseId;
+  }
+  if (categorySel) {
+    categorySel.innerHTML = Object.entries(CATEGORY_ID_TO_NAME)
+      .map(([id, name]) => `<option value="${id}">${name}</option>`)
+      .join("");
+  }
+}
+
+function openModal() {
+  if (!modalEl) return;
+  formEl.reset();
+  formEl.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+  formErrorEl.textContent = "";
+  populateFormOptions();
+  modalEl.hidden = false;
+  field("a-course")?.focus();
+}
+
+function closeModal() {
+  if (modalEl) modalEl.hidden = true;
+  document.getElementById("addAssignmentBtn")?.focus();
+}
+
+document.getElementById("addAssignmentBtn")?.addEventListener("click", openModal);
+document.getElementById("cancelAdd")?.addEventListener("click", closeModal);
+
+// Clicking the dimmed area outside the panel dismisses it; clicks inside don't.
+modalEl?.addEventListener("click", (e) => {
+  if (e.target === modalEl) closeModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modalEl && !modalEl.hidden) closeModal();
+});
+
+// Mirrors the server's rules (validateActivityPayload) so the common mistakes
+// are caught without a round-trip. The server still re-checks everything.
+function readForm() {
+  const errors = [];
+  let firstBad = null;
+  const bad = (el, msg) => {
+    errors.push(msg);
+    el.classList.add("is-invalid");
+    if (!firstBad) firstBad = el;
+  };
+
+  formEl.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+
+  const courseEl = field("a-course");
+  const nameEl = field("a-name");
+  const dueEl = field("a-due");
+  const weightEl = field("a-weight");
+  const reminderEl = field("a-reminder");
+
+  if (!courseEl.value) bad(courseEl, "Pick a course.");
+  if (!nameEl.value.trim()) bad(nameEl, "Enter an assignment name.");
+  if (!dueEl.value) bad(dueEl, "Pick a due date.");
+
+  const rawWeight = weightEl.value.trim();
+  let weight = 0;
+  if (rawWeight !== "") {
+    weight = Number(rawWeight);
+    if (!Number.isFinite(weight) || weight < 0 || weight > 100) {
+      bad(weightEl, "Weight must be between 0 and 100.");
+    }
+  }
+
+  // The DB enforces reminder_date <= due_date, so a bad pairing would otherwise
+  // come back as a save failure after the fact.
+  if (reminderEl.value && dueEl.value && reminderEl.value > dueEl.value) {
+    bad(reminderEl, "The reminder has to be on or before the due date.");
+  }
+
+  if (errors.length) {
+    firstBad?.focus();
+    return { errors };
+  }
+
+  return {
+    fields: {
+      course_id: Number(courseEl.value),
+      activity_name: nameEl.value.trim(),
+      activity_category_id: Number(field("a-category").value),
+      due_date: dueEl.value,
+      grading_weight: weight,
+      reminder_date: reminderEl.value || null,
+      reminder_method: field("a-method").value,
+      priority_level: field("a-priority").value,
+    },
+  };
+}
+
+formEl?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  formErrorEl.textContent = "";
+
+  const { errors, fields } = readForm();
+  if (errors) {
+    formErrorEl.textContent = errors.join(" · ");
+    return;
+  }
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving…";
+  try {
+    // The response is the row the server stored, so the card we render matches
+    // the database without a refetch.
+    activities.push(await createActivity(fields));
+    closeModal();
+    render();
+  } catch (err) {
+    formErrorEl.textContent =
+      err.message === "Failed to fetch"
+        ? "Could not reach the server. Is the backend running on port 5000?"
+        : err.message;
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Add assignment";
+  }
+});
+
 (async function init() {
   try {
     const [acts, courses] = await Promise.all([getActivities(), getCourses()]);
     activities = acts;
     coursesById = Object.fromEntries(courses.map((c) => [c.id, c]));
     populateFilters();
+    populateFormOptions();
     render();
   } catch (e) {
     listEl.innerHTML =

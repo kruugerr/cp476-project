@@ -6,6 +6,8 @@
  * - validateCoursePayload: strict server-side guard for POST /user/courses —
  *   never trust the client. Enforces required fields, category IDs, enums, and
  *   DATETIME formatting before anything hits an INSERT.
+ * - validateActivityPayload: the same guard for a single activity, used by
+ *   POST /user/activities and by validateCoursePayload for each activity it gets.
  */
 
 // activity_categories is: 1 Assignment, 2 Quiz, 3 Exam, 4 Project.
@@ -126,41 +128,72 @@ export function validateCoursePayload(payload) {
     const rawActivities = Array.isArray(payload?.activities) ? payload.activities : [];
     const activities = rawActivities.map((a, i) => {
         const label = a?.activity_name ? `"${a.activity_name}"` : `#${i + 1}`;
+        const result = validateActivityPayload(a, `activity ${label}: `);
+        errors.push(...result.errors);
+        return result.normalized;
+    });
 
-        const activity_name = clampStr(a?.activity_name, ACTIVITY_NAME_LIMIT);
-        if (!activity_name) errors.push(`activity ${label}: activity_name is required`);
+    return { ok: errors.length === 0, errors, normalized: { course, activities } };
+}
 
-        const activity_category_id = Number(a?.activity_category_id);
-        if (!VALID_CATEGORY_IDS.has(activity_category_id)) {
-            errors.push(`activity ${label}: activity_category_id must be one of 1,2,3,4`);
-        }
+// --------------------------------------------------------------------------- //
+// validateActivityPayload — one activity, for POST /user/activities           //
+// --------------------------------------------------------------------------- //
+/**
+ * Validates + normalizes a single activity into the exact shape
+ * activityModel.createActivity expects. Shared with validateCoursePayload so
+ * the manual "add assignment" path and the syllabus path can't drift apart.
+ *
+ * @param {object} a       raw activity from the client
+ * @param {string} prefix  prepended to each error, so the course path can say
+ *                         which activity in the list failed
+ */
+export function validateActivityPayload(a, prefix = "") {
+    const errors = [];
 
-        const due_date = toDateTime(a?.due_date);
-        if (!due_date) errors.push(`activity ${label}: a valid due_date is required`);
+    const activity_name = clampStr(a?.activity_name, ACTIVITY_NAME_LIMIT);
+    if (!activity_name) errors.push(`${prefix}activity_name is required`);
 
-        let grading_weight = toNumberOrNull(a?.grading_weight);
-        if (grading_weight == null || grading_weight < 0) grading_weight = 0;
-        grading_weight = Math.round(grading_weight * 100) / 100;
+    const activity_category_id = Number(a?.activity_category_id);
+    if (!VALID_CATEGORY_IDS.has(activity_category_id)) {
+        errors.push(`${prefix}activity_category_id must be one of 1,2,3,4`);
+    }
 
-        const reminder_method =
-            a?.reminder_method && VALID_REMINDER_METHODS.has(a.reminder_method)
-                ? a.reminder_method
-                : "email";
-        const priority_level =
-            a?.priority_level && VALID_PRIORITY_LEVELS.has(a.priority_level)
-                ? a.priority_level
-                : "medium";
+    const due_date = toDateTime(a?.due_date);
+    if (!due_date) errors.push(`${prefix}a valid due_date is required`);
 
-        return {
+    let grading_weight = toNumberOrNull(a?.grading_weight);
+    if (grading_weight == null || grading_weight < 0) grading_weight = 0;
+    if (grading_weight > 100) errors.push(`${prefix}grading_weight must be between 0 and 100`);
+    grading_weight = Math.round(grading_weight * 100) / 100;
+
+    // The DB has CHECK (reminder_date <= due_date) — catch it here so a bad
+    // pairing comes back as a readable 400 instead of a constraint 500.
+    const reminder_date = toDateTime(a?.reminder_date, "09:00:00");
+    if (reminder_date && due_date && reminder_date > due_date) {
+        errors.push(`${prefix}reminder_date must be on or before due_date`);
+    }
+
+    const reminder_method =
+        a?.reminder_method && VALID_REMINDER_METHODS.has(a.reminder_method)
+            ? a.reminder_method
+            : "email";
+    const priority_level =
+        a?.priority_level && VALID_PRIORITY_LEVELS.has(a.priority_level)
+            ? a.priority_level
+            : "medium";
+
+    return {
+        ok: errors.length === 0,
+        errors,
+        normalized: {
             activity_category_id,
             activity_name,
             due_date,
             grading_weight,
-            reminder_date: toDateTime(a?.reminder_date, "09:00:00"),
+            reminder_date,
             reminder_method,
             priority_level,
-        };
-    });
-
-    return { ok: errors.length === 0, errors, normalized: { course, activities } };
+        },
+    };
 }
