@@ -12,7 +12,7 @@ const JWT_SECRET = getJWTSecret();
 // it into a one-way hash before it touches the database.
 
 export const userRegister = async (req, res) => {
-    console.log("Received registration request:", req.body);
+    // console.log("Received registration request:", req.body);
     try {
         const { first_name, last_name, email, password, role } = req.body;
 
@@ -50,9 +50,37 @@ export const userRegister = async (req, res) => {
     }
 };
 
-export const userLogin = (req, res) => {
-    console.log("Received login request:", req.body);
+export const userRegisterOAuth = async (req, res) => {
+    const accessToken = req.body.access_token;
 
+    try {
+        const googleUser = await getGoogleUserInfo(accessToken);
+
+        console.log("Google user info:", googleUser);
+
+        if (!googleUser || !googleUser.email || !googleUser.email_verified) {
+            throw new Error();
+        }
+
+        const first_name = googleUser.given_name;
+        const last_name = googleUser.family_name;
+        const email = googleUser.email;
+
+        getUserByEmail(email, async (err, existingUser) => {
+            if (err) return res.status(500).json({ message: "Server error" });
+            if (existingUser)
+                return res
+                    .status(409)
+                    .json({ message: "Email already registered" });
+        });
+
+        res.status(200).json({ first_name, last_name, email });
+    } catch (error) {
+        res.status(401).json({ message: "Invalid Google credentials" });
+    }
+};
+
+export const userLogin = (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -71,7 +99,7 @@ export const userLogin = (req, res) => {
         const token = createToken(user);
 
         const { password_hash, ...safeUser } = user;
-        res.json({ user: safeUser, token });
+        res.status(200).json({ user: safeUser, token });
     });
 };
 
@@ -80,7 +108,6 @@ async function getGoogleUserInfo(accessToken) {
 
     client.setCredentials({ access_token: accessToken });
 
-    console.log(accessToken);
     const response = await client.request({
         url: "https://www.googleapis.com/oauth2/v3/userinfo",
     });
@@ -107,7 +134,7 @@ export const userLoginOAuth = async (req, res) => {
 
             const token = createToken(user);
             const { password_hash, ...safeUser } = user;
-            res.json({ user: safeUser, token });
+            res.status(200).json({ user: safeUser, token });
         });
     } catch (error) {
         res.status(401).json({ message: "Invalid Google credentials" });

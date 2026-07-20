@@ -3,14 +3,14 @@ let enrolled = [
     { id: 2, code: "MATH 201", name: "Linear Algebra", credits: 4 },
     { id: 3, code: "ECON 201", name: "Microeconomics", credits: 3 },
     { id: 4, code: "PSY 101", name: "Introduction to Psychology", credits: 3 },
-    { id: 5, code: "ENG 250", name: "Technical Writing", credits: 2 }
+    { id: 5, code: "ENG 250", name: "Technical Writing", credits: 2 },
 ];
 
 let catalog = {
-    "CS402": { code: "CS 402", name: "Computer Networks", credits: 3 },
-    "MATH301": { code: "MATH 301", name: "Calculus III", credits: 3 },
-    "BUS210": { code: "BUS 210", name: "Marketing Principles", credits: 3 },
-    "PHY101": { code: "PHY 101", name: "Intro to Physics", credits: 3 }
+    CS402: { code: "CS 402", name: "Computer Networks", credits: 3 },
+    MATH301: { code: "MATH 301", name: "Calculus III", credits: 3 },
+    BUS210: { code: "BUS 210", name: "Marketing Principles", credits: 3 },
+    PHY101: { code: "PHY 101", name: "Intro to Physics", credits: 3 },
 };
 
 let nextId = 6;
@@ -36,12 +36,22 @@ function render() {
         let item = document.createElement("div");
         item.className = "enrolled-item";
         item.innerHTML =
-            '<div class="course-avatar">' + avatarText(c.code) + '</div>' +
+            '<div class="course-avatar">' +
+            avatarText(c.code) +
+            "</div>" +
             '<div class="enrolled-info">' +
-                '<strong>' + c.name + '</strong>' +
-                '<p>' + c.code + ' &middot; ' + c.credits + ' credits</p>' +
-            '</div>' +
-            '<span class="drop-link" onclick="dropCourse(' + c.id + ')">Drop</span>';
+            "<strong>" +
+            c.name +
+            "</strong>" +
+            "<p>" +
+            c.code +
+            " &middot; " +
+            c.credits +
+            " credits</p>" +
+            "</div>" +
+            '<span class="drop-link" onclick="dropCourse(' +
+            c.id +
+            ')">Drop</span>';
         list.appendChild(item);
     }
 
@@ -50,8 +60,10 @@ function render() {
     let total = totalCredits();
     let remaining = maxCredits - total;
     document.getElementById("total-credits").innerHTML = total;
-    document.getElementById("credit-bar").style.width = (total / maxCredits) * 100 + "%";
-    document.getElementById("credit-note").innerHTML = remaining + " more credits available this semester";
+    document.getElementById("credit-bar").style.width =
+        (total / maxCredits) * 100 + "%";
+    document.getElementById("credit-note").innerHTML =
+        remaining + " more credits available this semester";
 }
 
 function joinCourse() {
@@ -89,7 +101,12 @@ function joinCourse() {
         return;
     }
 
-    enrolled.push({ id: nextId, code: course.code, name: course.name, credits: course.credits });
+    enrolled.push({
+        id: nextId,
+        code: course.code,
+        name: course.name,
+        credits: course.credits,
+    });
     nextId++;
     input.value = "";
 

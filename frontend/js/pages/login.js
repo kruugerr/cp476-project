@@ -1,4 +1,4 @@
-import { isEmail, setFieldError, clearFieldError } from "../validation.js";
+import { clearFieldError, isEmail, setFieldError } from "../validation.js";
 
 const API_URL = "http://localhost:5000";
 const form = document.querySelector(".auth-form");
@@ -8,100 +8,145 @@ const remember = document.getElementById("remember");
 const submitButton = form.querySelector('button[type="submit"]');
 
 email.addEventListener("input", function () {
-  clearFieldError(email);
+    clearFieldError(email);
 });
 
 password.addEventListener("input", function () {
-  clearFieldError(password);
+    clearFieldError(password);
 });
 
 form.addEventListener("submit", async function (event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  let firstBadField = null;
+    let firstBadField = null;
 
-  function showError(input, message) {
-    setFieldError(input, message);
+    function showError(input, message) {
+        setFieldError(input, message);
 
-    if (firstBadField === null) {
-      firstBadField = input;
-    }
-  }
-
-  if (email.value.trim() === "") {
-    showError(email, "Email is required.");
-  } else if (!isEmail(email.value.trim())) {
-    showError(email, "Enter a valid email address.");
-  }
-
-  if (password.value === "") {
-    showError(password, "Password is required.");
-  }
-
-  if (firstBadField !== null) {
-    firstBadField.focus();
-    return;
-  }
-
-  submitButton.disabled = true;
-  submitButton.textContent = "Signing in...";
-
-  try {
-    const response = await fetch(
-      API_URL + "/auth/login",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({ email: email.value.trim(), password: password.value })
-      }
-    );
-
-    const data = await response.json();
-
-    if (response.ok === false) {
-      throw new Error(
-        data.message || "Login failed."
-      );
+        if (firstBadField === null) {
+            firstBadField = input;
+        }
     }
 
-    if (remember.checked) {
-      localStorage.setItem("trackr-token", data.token);
-
-      localStorage.setItem(
-        "trackr-user",
-        JSON.stringify(data.user)
-      );
-    } else {
-      sessionStorage.setItem("trackr-token", data.token);
-
-      sessionStorage.setItem(
-        "trackr-user",
-        JSON.stringify(data.user)
-      );
+    if (email.value.trim() === "") {
+        showError(email, "Email is required.");
+    } else if (!isEmail(email.value.trim())) {
+        showError(email, "Enter a valid email address.");
     }
 
-    if (data.user.role === "admin") {
-      window.location.href = "admin-dashboard.html";
-    } else {
-      window.location.href = "dashboard.html";
+    if (password.value === "") {
+        showError(password, "Password is required.");
     }
-  } catch (error) {
-    setFieldError(password, error.message);
-    password.focus();
-  }
 
-  submitButton.disabled = false;
-  submitButton.textContent = "Log in";
+    if (firstBadField !== null) {
+        firstBadField.focus();
+        return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Signing in...";
+
+    try {
+        const response = await fetch(API_URL + "/auth/login", {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+                email: email.value.trim(),
+                password: password.value,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok === false) {
+            throw new Error(data.message || "Login failed.");
+        }
+
+        if (remember.checked) {
+            localStorage.setItem("trackr-token", data.token);
+
+            localStorage.setItem("trackr-user", JSON.stringify(data.user));
+        } else {
+            sessionStorage.setItem("trackr-token", data.token);
+
+            sessionStorage.setItem("trackr-user", JSON.stringify(data.user));
+        }
+
+        if (data.user.role === "admin") {
+            window.location.href = "admin-dashboard.html";
+        } else {
+            window.location.href = "dashboard.html";
+        }
+    } catch (error) {
+        setFieldError(password, error.message);
+        password.focus();
+    }
+
+    submitButton.disabled = false;
+    submitButton.textContent = "Log in";
 });
 
-const googleButton = document.querySelector(
-  '[data-action="google-login"]'
-);
+const oauthError = document.querySelector('[data-error-for="oauth"]');
+document.addEventListener("input", () => {
+    oauthError.textContent = "";
+});
 
+const clientId = document.getElementById("google-config").dataset.clientId;
+const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: "openid email profile",
+    callback: handleCredentialResponse,
+});
+
+const googleButton = document.querySelector('[data-action="google-login"]');
 googleButton.addEventListener("click", function () {
-  alert("Google login is not available yet.");
+    tokenClient.requestAccessToken({
+        prompt: "consent",
+    });
 });
+
+async function handleCredentialResponse(response) {
+    const idToken = response.access_token;
+    try {
+        // throw new Error("Google login. is not available. yet.");
+        const response = await fetch(API_URL + "/auth/login/oauth", {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+                access_token: idToken,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok === false) {
+            throw new Error(data.message || "Google login failed.");
+        }
+
+        if (remember.checked) {
+            localStorage.setItem("trackr-token", data.token);
+
+            localStorage.setItem("trackr-user", JSON.stringify(data.user));
+        } else {
+            sessionStorage.setItem("trackr-token", data.token);
+
+            sessionStorage.setItem("trackr-user", JSON.stringify(data.user));
+        }
+
+        if (data.user.role === "admin") {
+            window.location.href = "admin-dashboard.html";
+        } else {
+            window.location.href = "dashboard.html";
+        }
+    } catch (error) {
+        oauthError.textContent = error.message;
+    }
+}

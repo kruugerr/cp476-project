@@ -1,8 +1,11 @@
-import * as userModel from "../model/userModel.js";
-import * as courseModel from "../model/courseModel.js";
 import * as activityModel from "../model/activityModel.js";
+import * as courseModel from "../model/courseModel.js";
+import * as userModel from "../model/userModel.js";
 import { extractSyllabus } from "../services/extractor.js";
-import { normalizeExtraction, validateCoursePayload,} from "../services/syllabusNormalizer.js";
+import {
+    normalizeExtraction,
+    validateCoursePayload,
+} from "../services/syllabusNormalizer.js";
 
 // GET /user/courses
 // req.user comes from verifyToken middleware — this is the trustworthy
@@ -35,7 +38,8 @@ export const getCourseById = (req, res) => {
     const { courseId } = req.params;
     courseModel.getCourseById(courseId, req.user.user_id, (err, course) => {
         if (err) return res.status(500).json({ message: "Server error" });
-        if (!course) return res.status(404).json({ message: "Course not found" });
+        if (!course)
+            return res.status(404).json({ message: "Course not found" });
         res.json(course);
     });
 };
@@ -43,10 +47,14 @@ export const getCourseById = (req, res) => {
 // GET /user/courses/:courseId/activities
 export const getActivitiesByUserIdAndCourseId = (req, res) => {
     const { courseId } = req.params;
-    activityModel.getActivitiesByCourseId(courseId, req.user.user_id, (err, activities) => {
-        if (err) return res.status(500).json({ message: "Server error" });
-        res.json(activities);
-    });
+    activityModel.getActivitiesByCourseId(
+        courseId,
+        req.user.user_id,
+        (err, activities) => {
+            if (err) return res.status(500).json({ message: "Server error" });
+            res.json(activities);
+        },
+    );
 };
 
 // POST /user/upload-syllabus
@@ -75,7 +83,9 @@ export const uploadSyllabus = async (req, res) => {
         res.status(200).json(result);
     } catch (err) {
         console.error("Syllabus extraction failed:", err.message);
-        res.status(502).json({ message: "Extraction failed. Please try again." });
+        res.status(502).json({
+            message: "Extraction failed. Please try again.",
+        });
     }
 };
 
@@ -92,7 +102,8 @@ export const addCourse = (req, res) => {
     const { course, activities } = normalized;
 
     courseModel.createCourse(req.user.user_id, course, (err, newCourse) => {
-        if (err) return res.status(500).json({ message: "Failed to create course" });
+        if (err)
+            return res.status(500).json({ message: "Failed to create course" });
 
         if (!activities || activities.length === 0) {
             return res.status(201).json({ course: newCourse, activities: [] });
@@ -108,25 +119,33 @@ export const addCourse = (req, res) => {
         let hadError = false;
 
         activities.forEach((activity) => {
-            activityModel.createActivity(newCourse.course_id, activity, (err, newActivity) => {
-                remaining -= 1;
-                if (err) {
-                    hadError = true;
-                } else {
-                    createdActivities.push(newActivity);
-                }
+            activityModel.createActivity(
+                newCourse.course_id,
+                activity,
+                (err, newActivity) => {
+                    remaining -= 1;
+                    if (err) {
+                        hadError = true;
+                    } else {
+                        createdActivities.push(newActivity);
+                    }
 
-                if (remaining === 0) {
-                    if (hadError) {
-                        return res.status(207).json({
-                            message: "Course created, some activities failed",
+                    if (remaining === 0) {
+                        if (hadError) {
+                            return res.status(207).json({
+                                message:
+                                    "Course created, some activities failed",
+                                course: newCourse,
+                                activities: createdActivities,
+                            });
+                        }
+                        res.status(201).json({
                             course: newCourse,
                             activities: createdActivities,
                         });
                     }
-                    res.status(201).json({ course: newCourse, activities: createdActivities });
-                }
-            });
+                },
+            );
         });
     });
 };
@@ -138,7 +157,9 @@ export const getProfileById = (req, res) => {
     const { id } = req.params;
 
     if (Number(id) !== req.user.user_id) {
-        return res.status(403).json({ message: "Not authorized to view this profile" });
+        return res
+            .status(403)
+            .json({ message: "Not authorized to view this profile" });
     }
 
     userModel.getUserById(id, (err, user) => {
@@ -155,7 +176,9 @@ export const updateProfileById = (req, res) => {
     const { id } = req.params;
 
     if (Number(id) !== req.user.user_id) {
-        return res.status(403).json({ message: "Not authorized to edit this profile" });
+        return res
+            .status(403)
+            .json({ message: "Not authorized to edit this profile" });
     }
 
     const { profile } = req.body;
@@ -163,8 +186,11 @@ export const updateProfileById = (req, res) => {
         return res.status(400).json({ message: "Missing profile data" });
     }
 
-    userModel.updateUser(id, profile, (err, updatedUser) => {
-        if (err) return res.status(500).json({ message: "Failed to update profile" });
+    userModel.updateUserProfile(id, profile, (err, updatedUser) => {
+        if (err)
+            return res
+                .status(500)
+                .json({ message: "Failed to update profile" });
         res.json(updatedUser);
     });
 };
