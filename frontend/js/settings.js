@@ -3,22 +3,27 @@ import { requireAuth } from "./auth.js";
 
 let loaded = null;
 
-let daysToOption = { 1: "1 day before", 2: "2 days before", 3: "3 days before", 7: "1 week before" };
-let optionToDays = { "1 day before": 1, "2 days before": 2, "3 days before": 3, "1 week before": 7 };
+// The <option> values below are the only ones the dropdown offers. Anything else
+// in the DB (the syllabus importer can write arbitrary days) would leave the
+// select blank, so fall back to the column default instead.
+let reminderDayOptions = ["1", "2", "3", "7"];
 
 function fillForm(p) {
     document.getElementById("full-name").value = (p.firstName + " " + p.lastName).trim();
-    document.getElementById("student-id").value = p.id;
     document.getElementById("email").value = p.email;
-    document.getElementById("program").value = p.institution;
     document.getElementById("gpa-scale").value = String(p.gpaScale === 12 ? 12 : 4);
-    document.getElementById("reminder-time").value = daysToOption[p.reminderDays] || "1 day before";
-    document.getElementById("reminder-method").value = p.reminderMethod === "WhatsApp" ? "WhatsApp" : "Email";
+
+    let days = String(p.reminderDays);
+    document.getElementById("reminder-time").value =
+        reminderDayOptions.indexOf(days) === -1 ? "3" : days;
+
+    // Option values are lowercase to match the DB enum ('email','whatsapp').
+    document.getElementById("reminder-method").value =
+        p.reminderMethod === "whatsapp" ? "whatsapp" : "email";
 }
 
 async function saveProfile() {
     let name = document.getElementById("full-name").value.trim();
-    let email = document.getElementById("email").value;
     let msg = document.getElementById("profile-msg");
 
     msg.classList.remove("hide");
@@ -29,24 +34,20 @@ async function saveProfile() {
         return;
     }
 
-    if (email.indexOf("@") === -1) {
-        msg.className = "result-box bad";
-        msg.innerHTML = "Please enter a valid email address.";
-        return;
-    }
-
     let parts = name.split(" ");
     let firstName = parts.shift();
     let lastName = parts.join(" ");
 
     let scale = Number(document.getElementById("gpa-scale").value);
     let method = document.getElementById("reminder-method").value;
-    let days = optionToDays[document.getElementById("reminder-time").value] || 1;
+    let days = Number(document.getElementById("reminder-time").value);
 
     let patch = {
         first_name: firstName,
         last_name: lastName,
-        institution: document.getElementById("program").value,
+        // No longer editable on this page, but the UPDATE writes all seven
+        // columns — resend what's stored so the save doesn't null it out.
+        institution: loaded ? loaded.institution : null,
         theme_mode: document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light",
         preferred_gpa_scale: scale,
         default_reminder_days: days,

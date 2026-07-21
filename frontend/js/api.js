@@ -172,7 +172,7 @@ export async function getProfile() {
     gpaScale: Number(row.preferred_gpa_scale) || 4.0,
     themeMode: row.theme_mode || "light",
     reminderDays: row.default_reminder_days ?? 1,
-    reminderMethod: row.default_reminder_method || "Email",
+    reminderMethod: row.default_reminder_method || "email",
   };
 }
 
