@@ -47,7 +47,7 @@ async function saveProfile() {
         first_name: firstName,
         last_name: lastName,
         institution: document.getElementById("program").value,
-        theme_mode: document.body.classList.contains("dark") ? "dark" : "light",
+        theme_mode: document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light",
         preferred_gpa_scale: scale,
         default_reminder_days: days,
         default_reminder_method: method
@@ -72,12 +72,15 @@ function resetProfile() {
 }
 
 function setTheme(mode) {
+    document.documentElement.setAttribute("data-theme", mode);
+    try {
+        localStorage.setItem("trackr-theme", mode);
+    } catch (e) {}
+
     if (mode === "dark") {
-        document.body.classList.add("dark");
         document.getElementById("dark-btn").classList.add("active");
         document.getElementById("light-btn").classList.remove("active");
     } else {
-        document.body.classList.remove("dark");
         document.getElementById("light-btn").classList.add("active");
         document.getElementById("dark-btn").classList.remove("active");
     }
@@ -88,7 +91,7 @@ function logout() {
     sessionStorage.removeItem("trackr-token");
     localStorage.removeItem("trackr-user");
     sessionStorage.removeItem("trackr-user");
-    window.location.href = "login.html";
+    window.location.replace("login.html");
 }
 
 function deleteAccount() {
@@ -103,7 +106,8 @@ async function init() {
     try {
         loaded = await getProfile();
         fillForm(loaded);
-        if (loaded.themeMode === "dark") setTheme("dark");
+        let current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+        setTheme(current);
     } catch (e) {
         let msg = document.getElementById("profile-msg");
         msg.classList.remove("hide");
