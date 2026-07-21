@@ -4,10 +4,14 @@ import { statCard, statCardSkeleton } from '../components/statCard.js';
 import { assignmentRow, assignmentRowSkeleton } from '../components/assignmentRow.js';
 import { courseCard, courseCardSkeleton } from '../components/courseCard.js';
 import { progressBar } from '../components/progressBar.js';
+import { getUser } from '../auth.js';
 
 const $ = (s) => document.querySelector(s);
 const DAY = 86400000;
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const storedUser = getUser();
+if (storedUser?.first_name) $('#dashName').textContent = storedUser.first_name;
 
 const ICON = {
   gpa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>',
