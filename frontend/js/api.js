@@ -64,6 +64,26 @@ export async function getActivities() {
   return activities;
 }
 
+// One course + its activities, for the course detail page. 
+export async function getCourse(id) {
+  const [row, rawActivities] = await Promise.all([
+    apiGet(`/user/courses/${id}`),
+    apiGet(`/user/courses/${id}/activities`),
+  ]);
+  const activities = rawActivities.map(adaptActivity);
+
+  // adaptCourse's index only picks the palette colour — look up this course's
+  // position in the full list so the detail page matches its card on the grid.
+  let index = 0;
+  try {
+    const all = await getCourses();
+    const i = all.findIndex((c) => String(c.id) === String(id));
+    if (i >= 0) index = i;
+  } catch { /* colour is cosmetic; fall back to the first palette entry */ }
+
+  return { course: adaptCourse(row, index, activities), raw: row, activities };
+}
+
 export async function getSemester() {
   const { currentTerm } = await loadData();
   return { term: currentTerm };
@@ -84,6 +104,38 @@ export async function updateActivity(id, { grade, status }) {
   }
   invalidateData();
   return adaptActivity(await res.json());
+}
+
+// POST /user/activities — add one assignment to an existing course, from the
+// Add assignment modal. `fields` is already snake_case (it mirrors the DB
+// columns) and must include course_id. Returns the stored row, adapted.
+export async function createActivity(fields) {
+  const res = await fetch(`${API_BASE}/user/activities`, {
+    method: "POST",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ activity: fields }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const detail = Array.isArray(body.errors) ? body.errors.join(" · ") : null;
+    throw new Error(detail || body.message || `Save failed (${res.status})`);
+  }
+  invalidateData();
+  return adaptActivity(await res.json());
+}
+
+// DELETE /user/activities/:id — remove an assignment from its card. Succeeds
+// with 204 and no body, so there's nothing to parse or return.
+export async function deleteActivity(id) {
+  const res = await fetch(`${API_BASE}/user/activities/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || `Delete failed (${res.status})`);
+  }
+  invalidateData();
 }
 
 // Assembled from the user stored at login (auth.js) plus a computed GPA. Fields
@@ -120,7 +172,7 @@ export async function getProfile() {
     gpaScale: Number(row.preferred_gpa_scale) || 4.0,
     themeMode: row.theme_mode || "light",
     reminderDays: row.default_reminder_days ?? 1,
-    reminderMethod: row.default_reminder_method || "Email",
+    reminderMethod: row.default_reminder_method || "email",
   };
 }
 

@@ -1,9 +1,9 @@
 /* Trackr — inject shared partials, then wire the app shell. */
+import { getUser } from './auth.js';
 
 /* Replace a failed include slot with a visible, styled alert so a broken
    partial never silently deletes the whole shell again. */
 
-   console.log
 function failSlot(slot, url, detail) {
   const box = document.createElement('div');
   box.setAttribute('role', 'alert');
@@ -17,16 +17,34 @@ function failSlot(slot, url, detail) {
   slot.replaceWith(box);
 }
 
+const PARTIAL_CACHE_VERSION = 'v1';
+
+function insertPartial(slot, html) {
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html.trim();
+  slot.replaceWith(tpl.content);
+}
+
 async function includePartials() {
   const slots = [...document.querySelectorAll('[data-include]')];
   await Promise.all(slots.map(async (slot) => {
     const url = slot.getAttribute('data-include');
+    const cacheKey = `trackr-partial:${PARTIAL_CACHE_VERSION}:${url}`;
+
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        insertPartial(slot, cached);
+        return;
+      }
+    } catch { }
+
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const tpl = document.createElement('template');
-      tpl.innerHTML = (await res.text()).trim();
-      slot.replaceWith(tpl.content);
+      const html = await res.text();
+      try { sessionStorage.setItem(cacheKey, html); } catch { /* ignore */ }
+      insertPartial(slot, html);
     } catch (e) {
       console.error('[include] failed to load', url, e);
       failSlot(slot, url, e.message || String(e));
@@ -36,6 +54,28 @@ async function includePartials() {
 
 function initShell() {
   const body = document.body;
+
+  function renderUserIdentity(user = getUser()) {
+    if (!user) return;
+    const first = String(user.first_name || '').trim();
+    const last = String(user.last_name || '').trim();
+    const fullName = [first, last].filter(Boolean).join(' ') || user.email || 'User';
+    const initials = ((first[0] || '') + (last[0] || first[1] || '')).toUpperCase() || '?';
+
+    document.querySelectorAll('[data-user-initials]').forEach((el) => { el.textContent = initials; });
+    document.querySelectorAll('[data-user-name]').forEach((el) => { el.textContent = fullName; });
+    document.querySelectorAll('[data-user-email]').forEach((el) => { el.textContent = user.email || ''; });
+    document.querySelectorAll('[data-user-role]').forEach((el) => {
+      const role = String(user.role || 'student');
+      el.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+    });
+    document.querySelectorAll('[data-profile-link]').forEach((link) => {
+      link.href = user.role === 'admin' ? 'admin-settings.html' : 'settings.html';
+    });
+  }
+
+  renderUserIdentity();
+  body.addEventListener('profile:updated', (event) => renderUserIdentity(event.detail));
 
   /* active nav item from <body data-page="..."> */
   const page = body.dataset.page;
@@ -104,6 +144,14 @@ function initShell() {
 }
 
 async function boot() {
+  // Apply the saved width before the sidebar enters the document, preventing
+  // a collapsed sidebar from flashing at full width between pages.
+  try {
+    document.body.classList.toggle(
+      'is-collapsed',
+      localStorage.getItem('trackr-sidebar') === 'collapsed',
+    );
+  } catch { /* ignore */ }
   await includePartials();
   initShell();
 }

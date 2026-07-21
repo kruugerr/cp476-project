@@ -50,6 +50,25 @@
     width: 250px;
 }
 
+/* Read-only fields (e.g. email) — visibly not editable. */
+.settings-content input[readonly] {
+    background-color: var(--surface-2);
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+.field-hint {
+    margin: 6px 0 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+/* Not-yet-implemented controls should not read as functional. */
+.switch input:disabled + .slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .settings-buttons {
     margin-top: 18px;
     display: flex;
