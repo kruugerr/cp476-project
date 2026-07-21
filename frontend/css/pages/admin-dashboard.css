@@ -31,22 +31,14 @@
 .app .admin-toolbar select:hover { border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
 .app .admin-toolbar select:focus { outline: none; border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); box-shadow: 0 0 0 3px var(--primary-soft); }
 
-/* ---- segmented tabs (Active / Archived) ---- */
-.seg { display: inline-flex; gap: 2px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 3px; }
-.seg__btn { font: inherit; font-size: .82rem; font-weight: 500; cursor: pointer; border: 0; background: transparent; color: var(--muted); padding: .35rem .8rem; border-radius: calc(var(--radius-lg) - 3px); transition: background .15s, color .15s; }
-.seg__btn:hover { color: var(--text); }
-.seg__btn.is-active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--shadow-card); }
-
 /* ---- recent activity feed ---- */
 .afeed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .afeed__item { display: flex; gap: .7rem; padding: .7rem .1rem; border-top: 1px solid var(--border); }
 .afeed__item:first-child { border-top: 0; }
 .afeed__dot { width: 9px; height: 9px; border-radius: 50%; margin-top: .45rem; flex: none; background: var(--neutral); }
-.afeed__dot--register { background: var(--success); }
-.afeed__dot--upload   { background: var(--primary); }
-.afeed__dot--flag     { background: var(--progress); }
-.afeed__dot--fail     { background: var(--danger); }
-.afeed__dot--archive  { background: var(--muted); }
+.afeed__dot--register   { background: var(--success); }
+.afeed__dot--course     { background: var(--primary); }
+.afeed__dot--assignment { background: var(--progress); }
 .afeed__body { min-width: 0; }
 .afeed__text { font-size: .88rem; line-height: 1.45; margin: 0; }
 .afeed__text b { font-weight: 600; }
@@ -57,24 +49,11 @@
 .acard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1rem 1.1rem; }
 .acard__head { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-bottom: .55rem; }
 .acard__code { font-family: var(--font-mono); font-size: .72rem; font-weight: 600; color: #fff; background: var(--c, var(--primary)); padding: .2rem .5rem; border-radius: 6px; }
-.acard__status { font-size: .7rem; font-weight: 600; padding: .2rem .55rem; border-radius: 999px; }
-.acard__status--active   { color: var(--success); background: var(--success-soft); }
-.acard__status--archived { color: var(--muted); background: var(--neutral-soft); }
 .acard__name { font-size: .98rem; font-weight: 600; margin: 0 0 .15rem; letter-spacing: -.01em; }
 .acard__meta { font-size: .78rem; color: var(--muted); margin: 0 0 .8rem; }
 .acard__foot { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
 .acard__stats { font-size: .76rem; color: var(--muted); font-family: var(--font-mono); }
 .acard__stats b { color: var(--text); }
-
-/* avatar stack */
-.astack { display: flex; align-items: center; margin: .55rem 0 .85rem; }
-.astack__a { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: .66rem; font-weight: 600; font-family: var(--font-mono); color: #fff; border: 2px solid var(--surface); margin-left: -8px; }
-.astack__a:first-child { margin-left: 0; }
-.astack__more { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: .64rem; font-weight: 600; color: var(--muted); background: var(--surface-2); border: 2px solid var(--surface); margin-left: -8px; }
-
-.acard__actions { display: flex; gap: .45rem; }
-.app .acard__actions button { font-size: .8rem; padding: .4rem .8rem; }
-.app .acard__actions .btn-ghost { background: var(--surface); }
 
 /* ---- student table ---- */
 .admin-tablewrap { overflow-x: auto; }
@@ -83,7 +62,6 @@
 .admin-table th { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; font-family: var(--font-mono); }
 .admin-table tbody tr:last-child td { border-bottom: 0; }
 .admin-table tbody tr:hover { background: var(--surface-2); }
-.admin-table__actions-h { text-align: right; }
 
 .atd-student { display: flex; align-items: center; gap: .65rem; }
 .atd-student__avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: .7rem; font-weight: 600; font-family: var(--font-mono); color: #fff; flex: none; }
@@ -91,24 +69,9 @@
 .atd-student__email { font-size: .76rem; color: var(--muted); }
 .admin-table td[data-num] { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-.apill { font-size: .72rem; font-weight: 600; padding: .22rem .6rem; border-radius: 999px; }
-.apill--active   { color: var(--success); background: var(--success-soft); }
-.apill--inactive { color: var(--muted);  background: var(--neutral-soft); }
-
-.arow-actions { display: flex; gap: .35rem; justify-content: flex-end; }
-.abtn { font: inherit; font-size: .78rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: var(--radius-lg); padding: .35rem .7rem; transition: background .15s, color .15s, border-color .15s; }
-.abtn:hover { background: var(--surface-2); }
-.abtn--danger { color: var(--danger); }
-.abtn--danger:hover { background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 35%, var(--border)); }
-.arow-actions tr.is-disabled, .admin-table tr.is-disabled { opacity: .55; }
-
 /* empty states */
 .admin-empty { padding: 1.75rem 1rem; text-align: center; color: var(--muted); font-size: .88rem; }
 .admin-empty b { color: var(--text); }
-
-/* ---- toast ---- */
-.admin-toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 16px); background: var(--ink-deep); color: #fff; font-size: .85rem; font-weight: 500; padding: .7rem 1.1rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-pop); opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 80; }
-.admin-toast.is-show { opacity: 1; transform: translate(-50%, 0); }
 
 /* ---- skeleton helpers reused via dashboard.css .sk ---- */
 .afeed .sk--line { height: 12px; }
@@ -120,7 +83,4 @@
 @media (max-width: 560px) {
   .admin-toolbar { flex-direction: column; align-items: stretch; }
   .app .admin-toolbar select { width: 100%; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .admin-toast { transition: none; }
 }

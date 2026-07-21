@@ -58,10 +58,6 @@
           <section class="dash-card admin-courses" aria-label="Course management">
             <div class="dash-card__head">
               <h2>Courses</h2>
-              <div class="seg" role="tablist" aria-label="Course status">
-                <button class="seg__btn is-active" type="button" data-tab="active" role="tab" aria-selected="true">Active</button>
-                <button class="seg__btn" type="button" data-tab="archived" role="tab" aria-selected="false">Archived</button>
-              </div>
             </div>
             <div class="admin-toolbar">
               <label class="admin-field admin-field--search">
@@ -87,11 +83,6 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
               <input type="search" id="studentSearch" placeholder="Search by name or email…" aria-label="Search students" />
             </label>
-            <select id="statusFilter" aria-label="Filter by account status">
-              <option value="all">All statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
           </div>
           <div class="admin-tablewrap">
             <table class="admin-table">
@@ -100,9 +91,8 @@
                   <th scope="col">Student</th>
                   <th scope="col">Student ID</th>
                   <th scope="col">Courses</th>
+                  <th scope="col">Assignments</th>
                   <th scope="col">Joined</th>
-                  <th scope="col">Status</th>
-                  <th scope="col" class="admin-table__actions-h">Actions</th>
                 </tr>
               </thead>
               <tbody id="adminStudents"></tbody>
@@ -111,9 +101,6 @@
         </section>
       </main>
     </div>
-
-    <!-- live region for action feedback (reset password, archive, disable) -->
-    <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
 
     <script type="module" src="../js/include.js"></script>
     <script type="module" src="../js/pages/admin-dashboard.js"></script>
