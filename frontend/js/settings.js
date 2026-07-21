@@ -61,9 +61,21 @@ async function saveProfile() {
         const storage = localStorage.getItem("trackr-user") ? localStorage : sessionStorage;
         let stored = {};
         try { stored = JSON.parse(storage.getItem("trackr-user")) || {}; } catch { /* ignore invalid old data */ }
-        stored = { ...stored, first_name: firstName, last_name: lastName };
+        stored = { ...stored, ...patch };
         storage.setItem("trackr-user", JSON.stringify(stored));
         document.body.dispatchEvent(new CustomEvent("profile:updated", { detail: stored }));
+
+        // Keep the snapshot Reset restores from in step with what was just saved.
+        loaded = {
+            ...loaded,
+            firstName: firstName,
+            lastName: lastName,
+            institution: patch.institution,
+            themeMode: patch.theme_mode,
+            gpaScale: patch.preferred_gpa_scale,
+            reminderDays: patch.default_reminder_days,
+            reminderMethod: patch.default_reminder_method
+        };
         msg.className = "result-box good";
         msg.innerHTML = "Your changes have been saved.";
     } catch (e) {
