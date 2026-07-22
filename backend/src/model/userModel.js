@@ -237,3 +237,30 @@ export const createPasswordResetToken = (userID, token, expiresAt, callback) => 
         );
     });
 };
+
+export const deleteUserById = (userId, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+
+        const query = `
+            DELETE FROM users
+            WHERE user_id = ?
+        `;
+
+        db.query(query, [userId], (err, results) => {
+            db.release();
+
+            if (err) {
+                console.error("Error deleting user account:", err);
+                return callback(err, null);
+            }
+
+            callback(null, {
+                affectedRows: results.affectedRows,
+            });
+        });
+    });
+};
