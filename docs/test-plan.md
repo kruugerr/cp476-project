@@ -1,200 +1,260 @@
 # Trackr — Test Plan (Milestone 3)
 
-**Course:** CP476B – Internet Computing (Spring 2026)
-**Last updated:** July 17, 2026
+**Course:** CP476B – Internet Computing (Spring 2026) 
+**Last updated:** July 22 2026
+
+---
 
 ## 1. Purpose and scope
 
-This test plan covers the end-to-end verification of our appTrackr, our full-stack academic management application built with a vanilla HTML/CSS/JS frontend, Node.js/Express backend, and a MySQL database hosted on Azure. It describes what was tested, how it was tested, the results of the final test run, and the defects and limitations.
+This test plan covers the end-to-end verification of Trackr, our full-stack academic management application built with a vanilla HTML/CSS/JS frontend, a Node.js/Express backend, and a MySQL database hosted on Azure. It defines the features under test, the test cases with their expected results, and the environment needed to run them. Results are recorded in the Testing Summary Report (Milestone 3 deliverable).
 
-**In scope (we are testing):** authentication(login, signup), user course/activity/profile workflows(user features), admin read endpoints, input validation(reject bad data), and access control (JWT + role checks).
+**In scope (we are testing):** authentication (login, signup, OAuth rejection paths), user course/activity/profile workflows, admin read endpoints, input validation (rejecting bad data), access control (JWT + role checks), and database integrity (constraints, foreign keys, cascade behaviour).
 
-**Out of scope (we are not testing):** load/performance testing, browser compatibility beyond Chrome/Firefox/Edge latest, and any features not implemented by the Milestone 3 code freeze (tracked in section 6 Known limitations).
+**Out of scope (we are not testing):** load and performance testing, browser compatibility beyond current Chrome/Firefox/Edge, and any features not implemented by the Milestone 3 code freeze (tracked in §8, Known limitations).
+
+---
 
 ## 2. Test environment
 
 | Item | Value |
 |---|---|
-| Backend | Node.js + Express, `http://localhost:5000` (`cd backend && npm run dev`) |
+| Backend | Node.js v24 + Express 5, `http://localhost:5000` (`cd backend && npm run dev`) |
+| Test server | `http://localhost:5050`, started automatically by the test runner |
+| Frontend | Static serve, `http://localhost:3000` |
+| Development database | MySQL 8.x on Azure, schema `trackr_db` |
+| Test database | MySQL 8.x on Azure, schema `trackr_test` — dropped and rebuilt from `db/db_init.sql` on every run |
+| Tables | `users`, `courses`, `activities`, `activity_categories`, `password_reset_tokens` |
+| API client | Postman (manual) / automated suite (see §9) |
+| Config | `backend/.env` (development) and `backend/.env.test` (tests). Both are gitignored; `.env.test.example` is committed as a template. |
 
-| Frontend | Static serve, `http://localhost:3000` (`npm start` from repo root) |
+**Test accounts.** None need to be created in advance. The automated suite registers its own accounts at run time using timestamped, unique e-mail addresses, so runs are independent of each other and of leftover data. Admin accounts are created by registering a user and then promoting the row directly in the database, because `/auth/register` hard-codes the role to `student` and the API provides no way to create an administrator.
 
-| Database | MySQL 8.x, database `trackr` with `users`, `courses`, `activities` tables |
+**Result key.** Pass · Fail · Partial · Skipped (blocked, reason recorded in the suite) · blank = not yet run.
 
-| API client | Postman (manual) / automated test suite (see section 7) |
-
-| Config | `backend/.env` with DB credentials + `JWT_SECRET` |
-
-
-**Test accounts (create before testing):**
-
-| Account | Role | Purpose |
-|---|---|---|
-| `student.test@trackr.dev`  password `Trackr2026!`| student | User workflow + negative admin tests |
-
-| `admin.test@trackr.dev` `Trackr2026!` password| admin | Admin endpoint tests |
-
+---
 
 ## 3. Test cases — Authentication (`/auth`)
 
 | ID | Test case | Steps | Expected result | Result | Notes |
 |---|---|---|---|---|---|
+| AUTH-01 | Register new user | POST `/auth/register` with a valid e-mail and password | 201, user created | Pass | Role is hard-coded to `student`; the client cannot choose |
+| AUTH-02 | Register duplicate e-mail | POST `/auth/register` with an e-mail that already exists | 409, no duplicate row in `users` | Pass | `uq_users_email` enforced |
+| AUTH-03 | Register with invalid e-mail format | POST `/auth/register` with `not-an-email` | 400, validation error, no row created | Pass | Row count checked after |
+| AUTH-04 | Register with missing fields | POST `/auth/register` with an empty body | 400, validation error | Pass | |
+| AUTH-05 | Login with valid credentials | POST `/auth/login` with the AUTH-01 credentials | 200, response contains a JWT and a user object with `role` | Pass | `password_hash` is not present in the response |
+| AUTH-06 | Login with wrong password | POST `/auth/login` with an incorrect password | 401, generic error that does not reveal which field was wrong | Pass | |
+| AUTH-07 | Login with non-existent e-mail | POST `/auth/login` with an unknown e-mail | Identical status **and body** to AUTH-06 | Pass | Bodies compared directly — prevents account enumeration |
+| AUTH-08 | Forgot password, existing e-mail | POST `/auth/forgot-password` with a registered e-mail | 200 | Skipped | Blocked by KI-02. Also sends real e-mail, so it is excluded from the automated suite by design — verify manually |
+| AUTH-08b | Forgot password, unknown e-mail | POST `/auth/forgot-password` with an unregistered e-mail | 200, same response as AUTH-08 | Skipped | Blocked by KI-02 |
+| AUTH-09 | Reset password with a valid token | POST `/auth/reset-password/:token` with the token from `password_reset_tokens` + a new password | 200, old password stops working, new one works | Skipped | Blocked by KI-03. Note the token is a **URL parameter**, not a body field |
+| AUTH-10 | Reset password with a bad token | POST `/auth/reset-password/fake-token` | 400, password unchanged | Skipped | Blocked by KI-03 |
+| AUTH-11 | Password stored hashed | Query the `users` table after AUTH-01 | `password_hash` contains a bcrypt hash, never plaintext | Pass | Pattern checked against `/^\$2[aby]\$/` |
+| AUTH-12 | OAuth register with an invalid credential | POST `/auth/register/oauth` with a garbage `credential` | 4xx, no user row created | | Google SSO is implemented. A real Google ID token cannot be minted in a test environment, so only the rejection path is automated |
+| AUTH-13 | OAuth login with an invalid credential | POST `/auth/login/oauth` with a garbage `credential` | 4xx, no JWT issued | | |
+| AUTH-14 | OAuth login with an empty body | POST `/auth/login/oauth` with `{}` | 4xx | | |
 
-| AUTH-01 | Register new user | POST `/auth/register` with valid email, password, role | 201/200, user created, token or success payload returned | | |
+---
 
-| AUTH-02 | Register duplicate email | POST `/auth/register` with an email that already exists | 409 (or 4xx) with clear error, no duplicate row in `users` | | |
+## 4. Test cases — User workflow (`/user`, JWT required)
 
-| AUTH-03 | Register with invalid email format | POST `/auth/register` with `not-an-email` | 400, validation error, no row created (no user should be crerated) | | |
+Everything a logged-in student can do.
 
-| AUTH-04 | Register with missing fields | POST `/auth/register` with empty body | 400, validation error | | |
-
-| AUTH-05 | Login with valid credentials | POST `/auth/login` with AUTH-01 credentials | 200, response contains JWT and user object with `role` | | |
-
-| AUTH-06 | Login with wrong password | POST `/auth/login` with wrong password | 401, generic error (does not reveal which field was wrong) | | |
-
-| AUTH-07 | Login with non-existent email | POST `/auth/login` with unknown email | 401, same generic error as AUTH-06 | | |
-
-| AUTH-08 | Forgot password request | POST `/auth/forgot-password` with existing email | 200 (Also: unknown emails should still return 200 to avoid revealing which accounts exist.) | | |
-
-| AUTH-09 | Reset password with valid token | POST `/auth/reset-password` with valid token + new password | 200, old password no longer works, new one does | | |
-
-| AUTH-10 | Reset password with bad/expired token | POST `/auth/reset-password` with fake token | 400, password unchanged(ger an error and password should not change) | | |
-
-| AUTH-11 | Password stored hashed | Inspect `users` table after AUTH-01 | Password column contains bcrypt hash, never plaintext | | |
-
-
-## 4. Test cases — User workflow (`/user`, JWT required)- Everything a Logged-in student can do
+### 4.1 Courses and dashboard
 
 | ID | Test case | Steps | Expected result | Result | Notes |
 |---|---|---|---|---|---|
+| USER-01 | View my courses | GET `/user/courses` with a valid student token | 200, only courses belonging to the logged-in user | Pass | Isolation verified: a second student's list excludes the seeded course |
+| USER-02 | View my activities | GET `/user/activities` | 200, only the user's activities | Pass | Second student's list is empty |
+| USER-03 | View my statistics | Seed one activity due tomorrow and one due yesterday, both ungraded, then GET `/user/statistics` | 200, correct `total_courses`, `upcoming`, `overdue` | Pass | Counts come from `activityModel.getStatisticsByUserId` |
+| USER-04 | Get a single course | GET `/user/courses/:courseId` for a course I own | 200, correct course data | Pass | |
+| USER-05 | Get a course I do not own | GET `/user/courses/:courseId` for another user's course | 403/404, no data leaked | Pass | Response body checked, not only the status code |
+| USER-06 | Get activities for a course | GET `/user/courses/:courseId/activities` | 200, scoped to this user and this course, ordered by due date | Pass | Sort order verified from the response, not from reading the SQL |
+| USER-07 | Add a course | POST `/user/courses/` with a valid payload | 201, row created, appears in USER-01 | Pass | |
+| USER-08 | Add a course with missing or invalid fields | POST `/user/courses/` with empty values | 400, no row created | Pass | Row count compared before and after |
+| USER-23 | Add the same course twice | POST `/user/courses/` twice with the same code and term | Second request rejected, only one row exists | | `uq_courses_user_code_term` |
 
-| USER-01 | Get my courses - View courses | GET `/user/courses` with valid student token | 200, only courses belonging to the logged-in user | | |
+### 4.2 Syllabus upload
 
-| USER-02 | Get my activities | GET `/user/activities` with valid token | 200, only the user's activities | | |
-
-| USER-03 | Get my statistics | Seed 1 activity due tomorrow + 1 due yesterday (both ungraded), then GET `/user/statistics` | 200 with `total_courses` correct, `upcoming: #`, `overdue: #` | | Counts come from `activityModel.getStatisticsByUserId` |
-
-| USER-04 | Get single course | GET `/user/courses/:courseId` for a course I own | 200, correct course data | | |
-
-| USER-05 | Get course I don't own | GET `/user/courses/:courseId` for another user's course | 403/404 — must not leak another user's data (blocks access tp someone else's course) | | |
-
-| USER-06 | Get activities for a course | GET `/user/courses/:courseId/activities` | 200, activities scoped to user + course (activities belongs to this course  + this student) | | |
-
-| USER-07 | Add course | POST `/user/courses/` with valid course payload | 200/201, row appears in `courses`, shows up in USER-01 | | |
-
-| USER-08 | Add course with missing/invalid fields | POST `/user/courses/` with empty name / bad data | 400, no row created | | |
-
-| USER-09 | Upload syllabus (stub) | POST `/user/upload-syllabus` with a valid file | 200, file received confirmation | | Controller is a stub; tests file acceptance only |
-
-| USER-10 | Upload with no file / bad file | POST `/user/upload-syllabus` with empty body, then with .exe | 400 "No file uploaded" for empty; graceful rejection for disallowed types, no crash | | |
-
-| USER-11 | View my profile | GET `/user/:id/profile` with own id + token | 200, profile data returned | | |
-
-| USER-12 | Update my profile | PUT `/user/:id/profile` with changed fields | 200, changes persist (verify with USER-11) | | |
-
-| USER-13 | Update another user's profile | PUT `/user/:id/profile` with someone else's id | Server uses `req.user.user_id` from token — other user's data must NOT change | | |
-
- 
-## 5. Test cases — Admin (`/admin`, JWT + admin role) and access control
- 
 | ID | Test case | Steps | Expected result | Result | Notes |
 |---|---|---|---|---|---|
+| USER-09 | Upload a valid syllabus PDF | POST `/user/upload-syllabus` with a PDF in the `file` field | 200, file received confirmation | | Controller is a stub; this tests file acceptance only. First run failed on a wrong field name in the test — corrected, awaiting re-run |
+| USER-10a | Upload with no file | POST `/user/upload-syllabus` with an empty body | 400, "No file uploaded" | Pass | |
+| USER-10b | Upload a disallowed file type | POST `/user/upload-syllabus` with a `.exe` | 4xx, graceful rejection, server still responding afterwards | Pass | A follow-up request confirms no crash |
 
-| ADM-01 | List all users | GET `/admin/users/` with admin token | 200, all users returned | | |
+### 4.3 Activities (assignments)
 
-| ADM-02 | Get single user | GET `/admin/users/:id` with admin token | 200, correct user | | |
-
-| ADM-03 | List all courses | GET `/admin/courses/` with admin token | 200, all courses | | |
-
-| ADM-04 | Get single course | GET `/admin/courses/:id` with admin token | 200, correct course | | |
-
-| ADM-05 | Global statistics (all users, all coursees...) | GET `/admin/statistics/` with admin token | 200, aggregate stats | | |
-
-| ADM-06 | All user activities | GET `/admin/user-activities/` with admin token | 200, activities across users | | |
-
-## security
-| SEC-01 | No token on protected route | GET `/user/courses` with no Authorization header | 401 | | |
-
-| SEC-02 | Malformed/garbage token | GET `/user/courses` with `Bearer abc123` | 401 | | |
-
-| SEC-03 | Expired token | GET `/user/courses` with expired JWT | 401 | | |
-
-| SEC-04 | Student token on admin route | GET `/admin/users/` with student token | 403 (blocked by `requireAdmin`) | | |
-
-| SEC-05 | SQL injection attempt | Login with email `' OR '1'='1` / add course named `'; DROP TABLE users;--` | Treated as plain text; no auth bypass, tables intact (parameterized queries) | | |
-
-| SEC-06 | XSS payload stored safely | Add course named `<script>alert(1)</script>`, view it in UI | Rendered as text, script does not execute | | |
-| SEC-07 | CORS config | Request from unexpected origin | Blocked per CORS config | | |
- 
-## 6. Test cases — Frontend UI
- 
 | ID | Test case | Steps | Expected result | Result | Notes |
 |---|---|---|---|---|---|
+| USER-14 | Add an activity | POST `/user/activities` with a valid payload | 201, appears in that course's activity list | | |
+| USER-15 | Add an activity with missing fields | POST `/user/activities` with an empty name and date | 400, no row created | | |
+| USER-16 | Add an activity to a course I do not own | POST `/user/activities` with another user's `course_id` | Rejected — must not appear on the victim's course | | Cross-user write |
+| USER-17 | Update an activity / record a grade | PUT `/user/activities/:activityId` with `grade` and `status` | 200, value persists on re-read | | DECIMAL columns are returned as strings by mysql2 — compare numerically |
+| USER-18 | Grade above the allowed range | PUT `/user/activities/:activityId` with `grade: 150` | Rejected, value not stored | | `chk_activities_grade` allows 0–100. A 500 here would mean only the database is validating, not the controller |
+| USER-19 | Update an activity I do not own | PUT `/user/activities/:activityId` with another user's token | Victim's activity unchanged | | |
+| USER-20 | Delete an activity I do not own | DELETE `/user/activities/:activityId` with another user's token | Activity still present | | |
+| USER-21 | Delete my own activity | DELETE `/user/activities/:activityId` | 200/204, gone from the list | | |
+| USER-22 | Delete an activity that does not exist | DELETE `/user/activities/99999999` | 4xx, not a 500 | | |
 
-| UI-01 | Signup form client-side validation | Submit signup with invalid email, weak password | Inline errors from `validation.js` / password checklist, no submit | | |
+### 4.4 Profile and account
 
-| UI-02 | Login → dashboard flow | Log in via UI with valid account | Redirect to dashboard, courses/activities render | | |
+| ID | Test case | Steps | Expected result | Result | Notes |
+|---|---|---|---|---|---|
+| USER-11 | View my profile | GET `/user/:id/profile` with my own id and token | 200, profile returned, no `password_hash` | Pass | |
+| USER-12 | Update my profile | PUT `/user/:id/profile` with one changed field | 200, change persists (verify with USER-11) | **Fail** | **KI-01** — 500, `Column 'first_name' cannot be null` |
+| USER-13 | Update another user's profile | PUT `/user/:id/profile` with someone else's id | The other user's data must **not** change | Partial | Security assertion passed. Failed only on the value KI-01 prevented writing |
+| USER-24 | Delete my account | DELETE `/user/account`, then query the database | 200/204; user row gone, and their courses and activities gone with it | | Verifies FK `ON DELETE CASCADE`. Setup asserts the data existed first, so a pass cannot be vacuous |
+| USER-25 | Token belonging to a deleted account | GET `/user/courses` with the deleted user's still-valid JWT | 4xx — the token must stop working | | The JWT is cryptographically valid; the user behind it is gone |
 
-| UI-03 | Role-based redirect | Log in as admin | Redirected to admin dashboard | | |
+---
 
-| UI-04 | Primary workflow end to end | Signup → login → add course → view course → view activities → update profile | Every step succeeds against the real backend (not mocks) | | |
+## 5. Test cases — Admin (`/admin`, JWT + admin role)
 
-| UI-05 | Navigation between pages | Click through all nav links / partials | All pages load via `include.js`, no broken links or console errors | | |
+| ID | Test case | Steps | Expected result | Result | Notes |
+|---|---|---|---|---|---|
+| ADM-01 | List all users | GET `/admin/users/` with an admin token | 200, all users returned | Pass | Also asserts no `password_hash` appears in any row |
+| ADM-02 | Get a single user | GET `/admin/users/:id` | 200, correct user | Pass | |
+| ADM-03 | List all courses | GET `/admin/courses/` | 200, all courses | Pass | |
+| ADM-04 | Get a single course | GET `/admin/courses/:id` | 200, correct course | Pass | |
+| ADM-05 | Global statistics | GET `/admin/statistics/` | 200, aggregate statistics | Pass | |
+| ADM-06 | All user activities | GET `/admin/user-activities/` | 200, activities across users | Pass | |
+| ADM-07 | Unknown user id | GET `/admin/users/99999999` | 4xx, not a 500 | Pass | Missing records handled, not crashed on |
+| ADM-08 | Recent activity feed | GET `/admin/recent-activity/` with an admin token | 200 | | Endpoint existed but had no test |
+| ADM-09 | Recent activity with a student token | GET `/admin/recent-activity/` as a student | 403 | | |
+| ADM-10 | Recent activity with no token | GET `/admin/recent-activity/` anonymously | 401 | | |
 
-| UI-06 | Graceful API failure | Stop the backend, use the UI | User-friendly error, no white screen / unhandled exception | | |
+### 5.1 Access control and input safety
 
-| UI-07 | Dashboard shows real data after integration | Log in as test student with seeded courses/activities, view dashboard | Counts and lists match the database, not `mock-data.js` values (no "Alex Chen" leftovers) | | Widgets with no backend source handled per §7 decision |
- 
+| ID | Test case | Steps | Expected result | Result | Notes |
+|---|---|---|---|---|---|
+| SEC-01 | No token on a protected route | GET `/user/courses` with no Authorization header | 401 | Pass | |
+| SEC-02 | Malformed token | GET `/user/courses` with `Bearer abc123` | 401 | **Fail** | **KI-04** — returns 403 |
+| SEC-03 | Expired token | GET `/user/courses` with an expired but validly signed JWT | 401 | **Fail** | KI-04 — returns 403. Access is correctly denied; only the status code is wrong |
+| SEC-04 | Student token on an admin route | GET `/admin/users/` with a student token | 403, blocked by `requireAdmin` | Pass | |
+| SEC-05a | SQL injection at login | POST `/auth/login` with `' OR '1'='1` | No bypass, no token issued, `users` table intact | Pass | Read path |
+| SEC-05b | SQL injection through a write path | Add a course named `'; DROP TABLE users;--` | Stored verbatim as text, schema intact | Pass | Write path — confirms parameterised queries on INSERT |
+| SEC-06 | XSS payload stored safely | Add a course named `<script>alert(1)</script>` | Returned as an inert JSON string | Pass | Browser-side rendering is covered manually by UI-15 |
+| SEC-07 | CORS with an unexpected origin | Send a request with an arbitrary `Origin` header | The arbitrary origin is not reflected back | Pass | |
+| SEC-08 | Admin routes with no credential | GET `/admin/users/`, `/admin/courses/`, `/admin/statistics/` anonymously | 401 on all three | Pass | Distinct from SEC-04, which covers the wrong role |
 
+---
+
+## 6. Test cases — Frontend UI (manual)
+
+| ID | Test case | Steps | Expected result | Result | Notes |
+|---|---|---|---|---|---|
+| UI-01 | Signup form client-side validation | Submit signup with an invalid e-mail and a weak password | Inline errors from `validation.js` and the password checklist; no submit | Pass | Client-side only — see KI-07 |
+| UI-02 | Login → dashboard flow | Log in through the UI with a valid account | Redirect to the dashboard; courses and activities render | | |
+| UI-03 | Role-based redirect | Log in as an admin | Redirected to the admin dashboard | | |
+| UI-04 | Primary workflow end to end | Signup → login → add course → view course → view activities → update profile | Every step succeeds against the real backend, not mocks | | Blocked on KI-01 for the final step |
+| UI-05 | Navigation between pages | Click through all nav links and partials | All pages load via `include.js`; no broken links or console errors | Pass | |
+| UI-06 | Graceful API failure | Stop the backend, then use the UI | User-friendly error; no white screen or unhandled exception | | |
+| UI-07 | Dashboard shows real data | Log in as a seeded student and view the dashboard | Counts and lists match the database, not `mock-data.js` (no "Alex Chen" leftovers) | | Widgets with no backend source are listed in §8 |
+| UI-08 | Student settings persist | Change theme and GPA scale, save, reload | Values persist; `users` row updated | | |
+| UI-09 | Admin settings profile | Log in as any admin and open Settings → Profile | The logged-in administrator's details load | **Fail** | **KI-06** — shows hard-coded "Sarah Johnson / ADM-001 / admin@trackr.ca" for every admin. Confirmed with a second account; the sidebar shows the correct name |
+| UI-10 | Admin settings save | Click Save Changes with the browser network tab open | A request is sent and succeeds | | If no request fires, the page is display-only |
+| UI-11 | Admin password change | Enter a new password, update, log out, log back in | The new password works | | Highest-risk case: a field that silently does nothing is worse than no field at all |
+| UI-12 | Admin settings toggles | Toggle the notification switches, reload | State persists | | No columns exist for these — expected to fail |
+| UI-13 | Delete an assignment through the UI | Delete an assignment, then reload | Removed and does not reappear | | |
+| UI-14 | Responsive layout | Desktop 1920 px, tablet 768 px, mobile 375 px | Usable at each width, no horizontal overflow | Partial | Desktop passes; tablet and mobile not yet checked |
+| UI-15 | XSS renders as text | View the course created in SEC-06 in the browser | Rendered as visible text; no alert fires | | Completes the browser half of SEC-06 |
+
+---
 
 ## 7. Traceability — user stories to test cases
 
-Maps Milestone 1 user stories (docs/user-stories.md / proposal) to the test cases that verify them.
-
 | Story | Feature | Verified by | Coverage notes |
 |---|---|---|---|
-
-| US-01 Authentication | Register/login with role | AUTH-01–AUTH-07, AUTH-11, UI-01, UI-02, UI-03 | Google SSO not implemented in backend (see section 8). Weak-password check is client-side only |
-
-| US-02 Syllabus upload + AI extraction | Upload PDF, extract fields | USER-09, USER-10 | Backend is a stub — extraction not implemented (section 8) |
-
-| US-03 Extraction review & confirm | Edit/confirm parsed fields | — | No backend endpoints exist; UI page only (section 8) |
-
-| US-04 Semester dashboard | Courses, stats, weekly glance | USER-01, USER-02, USER-03, UI-04, UI-07 | Study hours / streak / GPA delta widgets are mock-only (section 8) |
-
-| US-05 Course view | Syllabus details, sorted assignments, grade breakdown | USER-04, USER-06 | Sort-by-due-date verified via `ORDER BY due_date` in USER-02/06 responses |
-
-| US-06 Assignment details | Name, type, due date, weight, status, grade | USER-02, USER-06 | Status is derived (graded/upcoming/overdue); no stored status field |
-
-| US-07 GPA calculator | Scales, current GPA, target calc | USER-03 (partial) | GPA math is frontend-only; backend stores raw grades. Test via UI once integrated |
-
-| US-08 Reminders | Email/WhatsApp deadline reminders | — | No backend reminder/email delivery implemented (section 8) |
-
+| US-01 Authentication | Register / login with role | AUTH-01–07, AUTH-11–14, UI-01, UI-02, UI-03 | Google SSO routes exist (`/auth/register/oauth`, `/auth/login/oauth`); only the rejection paths are automated. Role selection at signup is ignored by the backend. Weak-password check is client-side only |
+| US-02 Syllabus upload + AI extraction | Upload PDF, extract fields | USER-09, USER-10a, USER-10b | Backend is a stub — extraction not implemented (§8) |
+| US-03 Extraction review & confirm | Edit / confirm parsed fields | — | No backend endpoints exist; UI page only (§8) |
+| US-04 Semester dashboard | Courses, statistics, weekly glance | USER-01, USER-02, USER-03, UI-04, UI-07 | Study hours, streak, and GPA delta widgets are mock-only (§8) |
+| US-05 Course view | Syllabus details, sorted assignments, grade breakdown | USER-04, USER-06 | Due-date ordering verified from the API response |
+| US-06 Assignment details | Name, type, due date, weight, status, grade | USER-06, USER-14, USER-17 | `status` is a stored ENUM column in `activities`, not derived |
+| US-07 GPA calculator | Scales, current GPA, target calculation | USER-03, USER-17 (partial) | GPA arithmetic is frontend-only; the backend stores raw grades |
+| US-08 Reminders | E-mail / WhatsApp deadline reminders | — | Reminder columns exist in the schema, but no scheduling or delivery is implemented (§8) |
 | US-09 Calendar monthly | Deadlines across courses | USER-02, UI-04 | Calendar rendering is frontend; data source is `/user/activities` |
+| US-10 Calendar weekly | Next-7-days view, priorities | USER-02, UI-04 | `priority_level` is a stored ENUM column with a default of `medium` |
+| US-11 Settings / profile | Edit profile and preferences | USER-11, USER-12, USER-13, UI-08 | Blocked by KI-01 |
+| US-12 Admin dashboard | Metrics, user and course management | ADM-01–10, SEC-04, SEC-08, UI-09–UI-12 | Admin API is read-only; archive, reset-password, and disable-account have no endpoints (§8) |
 
-| US-10 Calendar weekly | Next-7-days view, priorities | USER-02, UI-04 | Priority level marked "additional feature" in data plan |
+---
 
-| US-11 Settings/profile | Edit profile, preferences | USER-11, USER-12, USER-13 | |
+## 8. Known limitations and defects
 
-| US-12 Admin dashboard | Metrics, user/course management | ADM-01–ADM-06, SEC-04 | Backend admin routes are read-only; archive/reset-password/disable-account have no endpoints (section 8) |
+### 8.1 Defects found
 
-## 8. Known limitations (fill in at code freeze)
- 
-- Frontend currently uses mock APIs (`api.js`, `admin-api.js`); UI-02–UI-04 are blocked until real `fetch()` integration lands (see `INTEGRATION.md`).
-- Admin controllers in progress (Tyler / team) — ADM-01–ADM-06 blocked until merged.
-- Syllabus upload is a stub: the backend confirms file receipt but PDF parsing/extraction is not implemented. The `extraction-review.html` page has no backend support.
-- Dashboard widgets with no backend data source: study hours, study streak, GPA delta/cumulative GPA, and course percent-complete are currently hardcoded in `mock-data.js`. The backend `activities`/`courses` tables do not store this data. Team decision pending: implement, remove, or document as mock-driven.
-- Email delivery for forgot-password: confirm whether real or stubbed; adjust AUTH-08/09 accordingly.
-- Google SSO (US-01 acceptance criterion): no backend route exists; email/password only.
-- Extraction review flow (US-03): `extraction-review.html` exists but has no backend endpoints.
-- Reminders (US-08): reminder fields exist in the data plan, but no scheduling/email/WhatsApp delivery is implemented.
-- Admin write actions (US-12): archive course, reset password, disable account have no backend endpoints — admin API is read-only.
-- Weak-password validation is client-side only; the backend accepts any non-empty password.
+| ID | Severity | Description | Found by |
+|---|---|---|---|
+| KI-01 | High | `PUT /user/:id/profile` returns 500 on a partial update. The controller reads every profile column from the request body, so omitted fields are written as NULL and rejected by the `NOT NULL` constraint on `first_name`. Any partial edit from the settings page fails. | USER-12 |
+| KI-04 | Low | `verifyToken` returns 403 when `jwt.verify()` throws. A malformed or expired credential should return 401; 403 belongs to role failures. Access is correctly denied either way — only the status code is misleading. | SEC-02, SEC-03 |
+| KI-05 | Medium | `server.js` prints the full `JWT_SECRET` to standard output on every start-up. Anyone with terminal or log access obtains the key that signs every session token. | Server start-up output |
+| KI-06 | Medium | The admin settings Profile section is hard-coded to placeholder values and does not load the logged-in administrator. | UI-09 |
 
-## 8. Handoff notes for automated testing
- 
-- Every API case above (AUTH, USER, ADM, SEC) can be automated as HTTP tests: seed the two test accounts, capture tokens in a setup step, assert status codes + response shapes.
-- Suggested order: AUTH-01 → AUTH-05 first (produces the tokens everything else needs).
-- Reset the database between runs (fresh `trackr` schema) so duplicate-email and count-based assertions stay deterministic.
-- Record how to run the suite (one command) — Milestone 3 report must include it.
- 
+### 8.2 Blocked test cases
+
+- **KI-02 — Forgot password has no error handling.** `POST /auth/forgot-password` has no try/catch, so a database error leaves the request open with no response at all instead of returning a 500. AUTH-08 and AUTH-08b are written and skipped with this reason recorded in the suite.
+- **KI-03 — `password_reset_tokens` is missing from the schema file.** The table exists in `trackr_db` but was never added to `db/db_init.sql`. Because the test database is rebuilt from that file, the table does not exist there, which is what caused KI-02 to surface. A fresh clone of the repository gets a broken forgot-password flow. AUTH-09 and AUTH-10 are written and skipped.
+
+### 8.3 Unimplemented features
+
+- **Courses have no update or delete.** There is no `PUT /user/courses/:courseId` and no `DELETE /user/courses/:courseId`. Courses support create and read only; once added, a course cannot be edited or removed. Activities have full CRUD.
+- **KI-07 — Password strength is enforced in the browser only.** `validation.js` applies the password checklist client-side; the backend accepts any non-empty password, so a direct API call bypasses the check. This does not meet the US-01 acceptance criterion.
+- **Role selection at signup.** `/auth/register` hard-codes the role to `student`. The signup screen offers a Student/Admin choice that the backend ignores; admin accounts must be promoted directly in the database.
+- **Syllabus AI extraction (US-02, US-03).** The upload endpoint confirms file receipt but performs no parsing. `extraction-review.html` exists but has no backend endpoints.
+- **Reminders (US-08).** Reminder columns exist in the schema, but no scheduling, e-mail, or WhatsApp delivery is implemented.
+- **Admin write actions (US-12).** Admin routes are read-only. Archive course, reset password, and disable account have no endpoints.
+- **Admin settings fields without storage.** Administrator ID, Department, Language, Default Dashboard, Items Per Page, Time Zone, two-factor authentication, and the three notification toggles have no corresponding columns in the `users` table and therefore cannot persist.
+- **Dashboard widgets without a data source.** Study hours, study streak, GPA delta, and course percent-complete are hard-coded in `mock-data.js`; the schema does not store this data.
+
+### 8.4 Testing limitations
+
+- No load or performance testing was carried out.
+- Browser testing was limited to current Chrome, Firefox, and Edge.
+- Cross-site scripting was verified at the API layer, where the payload is stored and returned as an inert JSON string. Whether the browser executes it depends on the rendering layer, covered manually by UI-15.
+- Automated coverage stops at the HTTP boundary; frontend JavaScript has no unit tests.
+- Forgot-password sends genuine e-mail through `nodemailer`, so AUTH-08 is deliberately excluded from the automated suite and verified manually instead.
+
+---
+
+## 9. Running the automated suite
+
+From a clean clone of the repository:
+
+```bash
+cd backend
+npm install
+
+cp .env.test.example .env.test
+# edit .env.test and fill in your MySQL credentials
+# DB_NAME must end in "_test" or the runner refuses to start
+
+npm test
+```
+
+A single command performs the whole cycle: it drops and recreates the `trackr_test` database from `db/db_init.sql`, starts the server on port 5050 against that database, runs every test file in sequence, then shuts the server down.
+
+**Output.** Human-readable results print to the terminal; a machine-readable copy is written to `backend/test-results.tap`.
+
+**Safety.** Both the runner and the test harness refuse to start unless `DB_NAME` ends in `_test`, because the runner issues `DROP DATABASE` against whatever database it is pointed at. The development database cannot be affected.
+
+**Requirements.** Node.js 20 or newer. The suite uses the built-in `node:test` runner, global `fetch`, and global `FormData`. No external test framework is used — only `mysql2`, `jsonwebtoken`, and `dotenv`, all of which the project already depends on.
+
+**Test files**
+
+| File | Covers |
+|---|---|
+| `tests/run-tests.js` | Orchestration: database reset, server start-up, test execution, shutdown |
+| `tests/helpers/harness.js` | Shared HTTP client, database access, account creation, seed data |
+| `tests/auth.test.js` | AUTH-01 – AUTH-11 |
+| `tests/user.test.js` | USER-01 – USER-13 |
+| `tests/admin.test.js` | ADM-01 – ADM-07 |
+| `tests/security.test.js` | SEC-01 – SEC-08 |
+| `tests/coverage.test.js` | USER-14 – USER-25, AUTH-12 – AUTH-14, ADM-08 – ADM-10 |
+
+**Design notes**
+
+- Tests run with `--test-concurrency=1` because they share one database.
+- Each test creates the data it needs rather than depending on a fixed fixture, so cases can be run in any order and a re-run does not collide with the previous one.
+- Cross-user access cases assert the security property (the victim's data is unchanged) rather than a specific status code, so a correctly secured backend cannot fail them on a technicality.
+- The database is reset per run so that duplicate-email and count-based assertions stay deterministic.
