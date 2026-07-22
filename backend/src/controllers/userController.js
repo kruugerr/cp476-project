@@ -323,3 +323,27 @@ export const updateProfileById = (req, res) => {
         res.json(updatedUser);
     });
 };
+
+export const deleteCurrentUserAccount = (req, res) => {
+    const userId = req.user.user_id;
+
+    userModel.deleteUserById(userId, (err, result) => {
+        if (err) {
+            console.error("Delete account error:", err);
+
+            return res.status(500).json({
+                message: "Failed to delete account.",
+            });
+        }
+
+        if (!result || result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Account not found.",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Account deleted successfully.",
+        });
+    });
+};
