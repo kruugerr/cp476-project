@@ -90,49 +90,46 @@ export const createUser = (userData, callback) => {
 // intentionally excluded here; those need their own dedicated flows
 // (password reset, email change with re-verification, admin-only role
 // changes) rather than being editable through a general profile update.
+const UPDATABLE_PROFILE_COLUMNS = [
+    "first_name",
+    "last_name",
+    "institution",
+    "theme_mode",
+    "preferred_gpa_scale",
+    "default_reminder_days",
+    "default_reminder_method",
+];
+
 export const updateUserProfile = (userId, profileData, callback) => {
+    // Build the UPDATE from only the fields the client actually sent
+    const columns = UPDATABLE_PROFILE_COLUMNS.filter(
+        (col) =>
+            Object.prototype.hasOwnProperty.call(profileData, col) &&
+            profileData[col] !== undefined,
+    );
+
+    // Nothing to update — treat as a successful no-op rather than issuing an invalid "SET" with no assignments.
+    if (columns.length === 0) {
+        return callback(null, { user_id: userId });
+    }
+
     pool.getConnection((err, db) => {
         if (err) {
             console.error("Error getting database connection:", err);
             return callback(err, null);
         }
-        const {
-            first_name,
-            last_name,
-            institution,
-            theme_mode,
-            preferred_gpa_scale,
-            default_reminder_days,
-            default_reminder_method,
-        } = profileData;
 
-        const query = `
-            UPDATE users
-            SET first_name = ?, last_name = ?, institution = ?, theme_mode = ?,
-                preferred_gpa_scale = ?, default_reminder_days = ?, default_reminder_method = ?
-            WHERE user_id = ?
-        `;
+        const setClause = columns.map((col) => `${col} = ?`).join(", ");
+        const values = columns.map((col) => profileData[col]);
+        const query = `UPDATE users SET ${setClause} WHERE user_id = ?`;
 
-        db.query(
-            query,
-            [
-                first_name,
-                last_name,
-                institution || null,
-                theme_mode || "light",
-                preferred_gpa_scale || 12.0,
-                default_reminder_days || 3,
-                default_reminder_method || "email",
-                userId,
-            ],
-            (err, results) => {
-                if (err) {
-                    console.error("Error updating user:", err);
-                    return callback(err, null);
-                }
-                callback(null, { user_id: userId, ...profileData });
-            },
-        );
+        db.query(query, [...values, userId], (err, results) => {
+            if (err) {
+                console.error("Error updating user:", err);
+                return callback(err, null);
+            }
+            callback(null, { user_id: userId, ...profileData });
+        });
     });
 };
 

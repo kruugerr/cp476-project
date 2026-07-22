@@ -40,7 +40,7 @@ async function includePartials() {
     } catch { }
 
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const html = await res.text();
       try { sessionStorage.setItem(cacheKey, html); } catch { /* ignore */ }
