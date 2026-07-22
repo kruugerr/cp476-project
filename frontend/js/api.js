@@ -190,3 +190,18 @@ export async function updateProfile(patch) {
   if (!res.ok) throw new Error(`Save failed (${res.status})`);
   return res.json();
 }
+
+// DELETE /user/account — permanently deletes the logged-in user's account.
+export async function deleteAccount() {
+  const res = await fetch(`${API_BASE}/user/account`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || `Delete failed (${res.status})`);
+  }
+
+  return res.json();
+}
