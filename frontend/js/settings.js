@@ -113,10 +113,32 @@ function logout() {
     window.location.replace("login.html");
 }
 
-function deleteAccount() {
-    let ok = confirm("Are you sure you want to delete your account? This cannot be undone.");
-    if (ok) {
-        alert("Account deletion isn't available yet.");
+async function deleteAccount() {
+    const ok = confirm(
+        "Are you sure you want to permanently delete your account? This cannot be undone."
+    );
+
+    if (!ok) return;
+
+    const secondCheck = confirm(
+        "Final confirmation: your account, courses, and assignments may be permanently removed. Continue?"
+    );
+
+    if (!secondCheck) return;
+
+    try {
+        await deleteAccountApi();
+
+        localStorage.removeItem("trackr-token");
+        sessionStorage.removeItem("trackr-token");
+        localStorage.removeItem("trackr-user");
+        sessionStorage.removeItem("trackr-user");
+
+        alert("Your account was deleted successfully.");
+        window.location.replace("login.html");
+    } catch (error) {
+        console.error("Delete account failed:", error);
+        alert(error.message || "Could not delete your account. Please try again.");
     }
 }
 
