@@ -7,6 +7,15 @@ const password = document.getElementById("password");
 const remember = document.getElementById("remember");
 const submitButton = form.querySelector('button[type="submit"]');
 
+const show = document.getElementById("showPassword");
+show.addEventListener("change", function () {
+    if (this.checked) {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+});
+
 email.addEventListener("input", function () {
     clearFieldError(email);
 });
@@ -151,12 +160,4 @@ async function handleCredentialResponse(response) {
     }
 }
 
-const show = document.getElementById("showPassword");
 
-show.addEventListener("change", function () {
-    if (this.checked) {
-        password.type = "text";
-    } else {
-        password.type = "password";
-    }
-});
