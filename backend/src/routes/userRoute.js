@@ -43,6 +43,9 @@ const uploadPdf = (req, res, next) => {
 router.post("/upload-syllabus", uploadPdf, userController.uploadSyllabus);
 router.post("/courses/", userController.addCourse);
 
+// Delete the currently logged-in user's account
+router.delete("/account", userController.deleteCurrentUserAccount);
+
 // Profile page routes
 router.get("/:id/profile", userController.getProfileById);
 router.put("/:id/profile", userController.updateProfileById);
