@@ -22,10 +22,25 @@ const JWT_SECRET = getJWTSecret();
 // it into a one-way hash before it touches the database.
 
 export const userRegister = async (req, res) => {
-    console.log("Received registration request:", req.body);
+    console.log("Received registration request:", {
+        email: req.body.email,
+        role: req.body.role,
+    });
+
     try {
         const { first_name, last_name, email, password } = req.body;
-        const role = "student"; // Default role to "student"
+
+        const requestedRole = String(req.body.role || "student")
+            .trim()
+            .toLowerCase();
+
+        if (!["student", "admin"].includes(requestedRole)) {
+            return res.status(400).json({
+                message: "Invalid account role",
+            });
+        }
+
+        const role = requestedRole;
 
         if (!first_name || !last_name || !email || !password) {
             return res.status(400).json({ message: "Missing required fields" });
@@ -269,3 +284,4 @@ export const sendResetPasswordMail = (token, email) => {
     });
     console.log(`Password reset email sent to ${email} with token: ${token}`);
 };
+
