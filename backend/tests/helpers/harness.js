@@ -79,7 +79,7 @@ export async function api(
 // .single(...) call, otherwise multer sees no file and you get a false 400.
 export async function uploadFile(
     endpoint,
-    { token, field = "syllabus", filename = "test.pdf", content = "", type = "application/pdf" } = {},
+    { token, field = "file", filename = "test.pdf", content = "", type = "application/pdf" } = {},
 ) {
     const form = new FormData();
     form.append(field, new Blob([content], { type }), filename);
