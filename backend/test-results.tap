@@ -1,0 +1,385 @@
+TAP version 13
+# Subtest: Admin (/admin)
+    # Subtest: ADM-01 list all users -> 200, includes the seeded student
+    ok 1 - ADM-01 list all users -> 200, includes the seeded student
+      ---
+      duration_ms: 86.1999
+      type: 'test'
+      ...
+    # Subtest: ADM-02 get single user -> 200, correct user
+    ok 2 - ADM-02 get single user -> 200, correct user
+      ---
+      duration_ms: 84.6689
+      type: 'test'
+      ...
+    # Subtest: ADM-03 list all courses -> 200, includes the seeded course
+    ok 3 - ADM-03 list all courses -> 200, includes the seeded course
+      ---
+      duration_ms: 84.2601
+      type: 'test'
+      ...
+    # Subtest: ADM-04 get single course -> 200, correct course
+    ok 4 - ADM-04 get single course -> 200, correct course
+      ---
+      duration_ms: 87.37
+      type: 'test'
+      ...
+    # Subtest: ADM-05 global statistics -> 200, aggregate object
+    ok 5 - ADM-05 global statistics -> 200, aggregate object
+      ---
+      duration_ms: 86.5608
+      type: 'test'
+      ...
+    # Subtest: ADM-06 all user activities -> 200, spans users
+    ok 6 - ADM-06 all user activities -> 200, spans users
+      ---
+      duration_ms: 86.3054
+      type: 'test'
+      ...
+    # Subtest: ADM-07 unknown user id -> 404, not a 500
+    ok 7 - ADM-07 unknown user id -> 404, not a 500
+      ---
+      duration_ms: 84.2252
+      type: 'test'
+      ...
+    1..7
+ok 1 - Admin (/admin)
+  ---
+  duration_ms: 3586.3694
+  type: 'suite'
+  ...
+# Subtest: Authentication (/auth)
+    # Subtest: AUTH-01 register new user -> 201, row created
+    ok 1 - AUTH-01 register new user -> 201, row created
+      ---
+      duration_ms: 610.1731
+      type: 'test'
+      ...
+    # Subtest: AUTH-02 register duplicate email -> 409, no second row
+    ok 2 - AUTH-02 register duplicate email -> 409, no second row
+      ---
+      duration_ms: 705.0338
+      type: 'test'
+      ...
+    # Subtest: AUTH-03 register invalid email format -> 400, no row created
+    ok 3 - AUTH-03 register invalid email format -> 400, no row created
+      ---
+      duration_ms: 343.768
+      type: 'test'
+      ...
+    # Subtest: AUTH-04 register missing fields -> 400
+    ok 4 - AUTH-04 register missing fields -> 400
+      ---
+      duration_ms: 4.3153
+      type: 'test'
+      ...
+    # Subtest: AUTH-05 login valid credentials -> 200 with token + user.role
+    ok 5 - AUTH-05 login valid credentials -> 200 with token + user.role
+      ---
+      duration_ms: 372.1946
+      type: 'test'
+      ...
+    # Subtest: AUTH-06 login wrong password -> 401 generic
+    ok 6 - AUTH-06 login wrong password -> 401 generic
+      ---
+      duration_ms: 388.7605
+      type: 'test'
+      ...
+    # Subtest: AUTH-07 login non-existent email -> identical response to AUTH-06
+    ok 7 - AUTH-07 login non-existent email -> identical response to AUTH-06
+      ---
+      duration_ms: 324.708
+      type: 'test'
+      ...
+    # Subtest: AUTH-11 password stored hashed, never plaintext
+    ok 8 - AUTH-11 password stored hashed, never plaintext
+      ---
+      duration_ms: 314.6276
+      type: 'test'
+      ...
+    # Subtest: AUTH-08 forgot-password with existing email -> 200
+    ok 9 - AUTH-08 forgot-password with existing email -> 200 # SKIP KI-02: handler never sends a response; request times out
+      ---
+      duration_ms: 0.2945
+      type: 'test'
+      ...
+    # Subtest: AUTH-08b forgot-password with unknown email -> 200 (no account enumeration)
+    ok 10 - AUTH-08b forgot-password with unknown email -> 200 (no account enumeration) # SKIP KI-02: handler never sends a response; request times out
+      ---
+      duration_ms: 0.6448
+      type: 'test'
+      ...
+    # Subtest: AUTH-09 reset-password with a valid token -> 200, new password works
+    ok 11 - AUTH-09 reset-password with a valid token -> 200, new password works # SKIP KI-03: password_reset_tokens table does not exist in db/db_init.sql
+      ---
+      duration_ms: 0.1355
+      type: 'test'
+      ...
+    # Subtest: AUTH-10 reset-password with a bad token -> 400, password unchanged
+    ok 12 - AUTH-10 reset-password with a bad token -> 400, password unchanged # SKIP KI-03: password_reset_tokens table does not exist in db/db_init.sql
+      ---
+      duration_ms: 0.0677
+      type: 'test'
+      ...
+    1..12
+ok 2 - Authentication (/auth)
+  ---
+  duration_ms: 3067.1897
+  type: 'suite'
+  ...
+# Subtest: Security & access control
+    # Subtest: SEC-01 no token on protected route -> 401
+    ok 1 - SEC-01 no token on protected route -> 401
+      ---
+      duration_ms: 3.0108
+      type: 'test'
+      ...
+    # Subtest: SEC-02 malformed token -> 401
+    not ok 2 - SEC-02 malformed token -> 401
+      ---
+      duration_ms: 3.4462
+      type: 'test'
+      location: 'C:\\Users\\hp\\Desktop\\cp476-project\\backend\\tests\\security.test.js:32:5'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        
+        403 !== 401
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 401
+      actual: 403
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///C:/Users/hp/Desktop/cp476-project/backend/tests/security.test.js:34:16)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1113:7)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:788:7)
+      ...
+    # Subtest: SEC-03 expired but validly signed token -> 401
+    not ok 3 - SEC-03 expired but validly signed token -> 401
+      ---
+      duration_ms: 5.2817
+      type: 'test'
+      location: 'C:\\Users\\hp\\Desktop\\cp476-project\\backend\\tests\\security.test.js:37:5'
+      failureType: 'testCodeFailure'
+      error: |-
+        must reject on expiry, not accept a stale session
+        
+        403 !== 401
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 401
+      actual: 403
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///C:/Users/hp/Desktop/cp476-project/backend/tests/security.test.js:40:16)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1113:7)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:788:7)
+      ...
+    # Subtest: SEC-04 student token on admin route -> 403
+    ok 4 - SEC-04 student token on admin route -> 403
+      ---
+      duration_ms: 3.5317
+      type: 'test'
+      ...
+    # Subtest: SEC-05a SQL injection in login is treated as plain text (no bypass)
+    ok 5 - SEC-05a SQL injection in login is treated as plain text (no bypass)
+      ---
+      duration_ms: 641.0388
+      type: 'test'
+      ...
+    # Subtest: SEC-05b SQL injection in a write path leaves the schema intact
+    ok 6 - SEC-05b SQL injection in a write path leaves the schema intact
+      ---
+      duration_ms: 948.2396
+      type: 'test'
+      ...
+    # Subtest: SEC-06 XSS payload is stored and returned as inert data
+    ok 7 - SEC-06 XSS payload is stored and returned as inert data
+      ---
+      duration_ms: 332.4832
+      type: 'test'
+      ...
+    # Subtest: SEC-07 CORS does not reflect an arbitrary origin
+    ok 8 - SEC-07 CORS does not reflect an arbitrary origin
+      ---
+      duration_ms: 4.3759
+      type: 'test'
+      ...
+    # Subtest: SEC-08 admin routes reject an anonymous request -> 401
+    ok 9 - SEC-08 admin routes reject an anonymous request -> 401
+      ---
+      duration_ms: 3.1503
+      type: 'test'
+      ...
+    1..9
+not ok 3 - Security & access control
+  ---
+  duration_ms: 3031.9112
+  type: 'suite'
+  location: 'C:\\Users\\hp\\Desktop\\cp476-project\\backend\\tests\\security.test.js:12:1'
+  failureType: 'subtestsFailed'
+  error: '2 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: User workflow (/user)
+    # Subtest: USER-01 get my courses -> 200, scoped to me only
+    ok 1 - USER-01 get my courses -> 200, scoped to me only
+      ---
+      duration_ms: 173.2019
+      type: 'test'
+      ...
+    # Subtest: USER-02 get my activities -> 200, scoped to me only
+    ok 2 - USER-02 get my activities -> 200, scoped to me only
+      ---
+      duration_ms: 690.0015
+      type: 'test'
+      ...
+    # Subtest: USER-03 statistics reflect seeded upcoming + overdue
+    ok 3 - USER-03 statistics reflect seeded upcoming + overdue
+      ---
+      duration_ms: 335.5099
+      type: 'test'
+      ...
+    # Subtest: USER-04 get single course I own -> 200
+    ok 4 - USER-04 get single course I own -> 200
+      ---
+      duration_ms: 325.9855
+      type: 'test'
+      ...
+    # Subtest: USER-05 get course I don't own -> 403/404, no data leak
+    ok 5 - USER-05 get course I don't own -> 403/404, no data leak
+      ---
+      duration_ms: 318.1758
+      type: 'test'
+      ...
+    # Subtest: USER-06 get activities for a course -> 200, scoped to user + course
+    ok 6 - USER-06 get activities for a course -> 200, scoped to user + course
+      ---
+      duration_ms: 330.1309
+      type: 'test'
+      ...
+    # Subtest: USER-07 add course -> 201, appears in my list
+    ok 7 - USER-07 add course -> 201, appears in my list
+      ---
+      duration_ms: 715.3264
+      type: 'test'
+      ...
+    # Subtest: USER-08 add course with invalid fields -> 400, no row created
+    ok 8 - USER-08 add course with invalid fields -> 400, no row created
+      ---
+      duration_ms: 767.1894
+      type: 'test'
+      ...
+    # Subtest: USER-09 upload a valid syllabus PDF -> 200, receipt confirmed
+    not ok 9 - USER-09 upload a valid syllabus PDF -> 200, receipt confirmed
+      ---
+      duration_ms: 8.4519
+      type: 'test'
+      location: 'C:\\Users\\hp\\Desktop\\cp476-project\\backend\\tests\\user.test.js:118:5'
+      failureType: 'testCodeFailure'
+      error: |-
+        {"message":"Unexpected field"}
+        
+        400 !== 200
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 200
+      actual: 400
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///C:/Users/hp/Desktop/cp476-project/backend/tests/user.test.js:126:16)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1113:7)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:788:7)
+      ...
+    # Subtest: USER-10a upload with no file -> 400
+    ok 10 - USER-10a upload with no file -> 400
+      ---
+      duration_ms: 4.5222
+      type: 'test'
+      ...
+    # Subtest: USER-10b upload a disallowed file type -> rejected without crashing
+    ok 11 - USER-10b upload a disallowed file type -> rejected without crashing
+      ---
+      duration_ms: 325.9603
+      type: 'test'
+      ...
+    # Subtest: USER-11 view my profile -> 200, no hash leaked
+    ok 12 - USER-11 view my profile -> 200, no hash leaked
+      ---
+      duration_ms: 313.9684
+      type: 'test'
+      ...
+    # Subtest: USER-12 update my profile -> changes persist
+    not ok 13 - USER-12 update my profile -> changes persist
+      ---
+      duration_ms: 307.7035
+      type: 'test'
+      location: 'C:\\Users\\hp\\Desktop\\cp476-project\\backend\\tests\\user.test.js:160:5'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        
+        500 !== 200
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 200
+      actual: 500
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///C:/Users/hp/Desktop/cp476-project/backend/tests/user.test.js:165:16)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1113:7)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:788:7)
+      ...
+    # Subtest: USER-13 cannot modify another user's profile
+    not ok 14 - USER-13 cannot modify another user's profile
+      ---
+      duration_ms: 379.8521
+      type: 'test'
+      location: 'C:\\Users\\hp\\Desktop\\cp476-project\\backend\\tests\\user.test.js:173:5'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        [32m+ actual[39m [31m- expected[39m
+        
+        [32m+[39m null
+        [31m- [39m'Wilfrid Laurier University'
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 'Wilfrid Laurier University'
+      actual: ~
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///C:/Users/hp/Desktop/cp476-project/backend/tests/user.test.js:193:16)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1113:7)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:788:7)
+      ...
+    1..14
+not ok 4 - User workflow (/user)
+  ---
+  duration_ms: 7959.8006
+  type: 'suite'
+  location: 'C:\\Users\\hp\\Desktop\\cp476-project\\backend\\tests\\user.test.js:13:1'
+  failureType: 'subtestsFailed'
+  error: '3 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..4
+# tests 42
+# suites 4
+# pass 33
+# fail 5
+# cancelled 0
+# skipped 4
+# todo 0
+# duration_ms 18377.1044

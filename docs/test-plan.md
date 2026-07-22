@@ -1,12 +1,11 @@
 # Trackr — Test Plan (Milestone 3)
 
 **Course:** CP476B – Internet Computing (Spring 2026)
-**Prepared by:** Zohra Haidary
 **Last updated:** July 17, 2026
 
 ## 1. Purpose and scope
 
-This test plan covers the end-to-end verification of Trackr, our full-stack academic management application (vanilla HTML/CSS/JS frontend, Node.js/Express backend, MySQL database). It defines the features under test, the test cases with expected results, and the environment needed to run them. Results will be recorded in the Testing Summary Report (Milestone 3 deliverable).
+This test plan covers the end-to-end verification of our appTrackr, our full-stack academic management application built with a vanilla HTML/CSS/JS frontend, Node.js/Express backend, and a MySQL database hosted on Azure. It describes what was tested, how it was tested, the results of the final test run, and the defects and limitations.
 
 **In scope (we are testing):** authentication(login, signup), user course/activity/profile workflows(user features), admin read endpoints, input validation(reject bad data), and access control (JWT + role checks).
 
