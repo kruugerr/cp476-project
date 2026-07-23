@@ -138,6 +138,22 @@ export async function deleteActivity(id) {
   invalidateData();
 }
 
+// DELETE /user/courses/:id — permanently removes a course.
+// Its related activities are removed automatically by the database.
+export async function deleteCourse(id) {
+  const res = await fetch(`${API_BASE}/user/courses/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || `Delete failed (${res.status})`);
+  }
+
+  invalidateData();
+}
+
 // Assembled from the user stored at login (auth.js) plus a computed GPA. Fields
 // with no data source (year, study streak, gpa delta) are intentionally gone.
 export async function getCurrentUser() {
