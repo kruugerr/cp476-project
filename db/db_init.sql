@@ -116,3 +116,12 @@ INSERT INTO activity_categories (activity_category_name) VALUES
     ('Project')
 ON DUPLICATE KEY UPDATE
     activity_category_name = VALUES(activity_category_name);
+
+CREATE TABLE password_reset_tokens (
+   id int NOT NULL AUTO_INCREMENT,
+   user_id int DEFAULT NULL,
+   token varchar(130) NOT NULL,
+   expires_at datetime DEFAULT NULL,
+   PRIMARY KEY (id),
+   UNIQUE KEY user_id (user_id)
+ ) 
