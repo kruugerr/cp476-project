@@ -23,6 +23,8 @@ router.get(
     userController.getActivitiesByUserIdAndCourseId,
 );
 
+router.delete("/courses/:courseId", userController.deleteCourseById);
+
 // Adding an assignment / recording a grade / removing one, from the
 // assignments page.
 router.post("/activities", userController.addActivity);
