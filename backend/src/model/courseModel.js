@@ -90,3 +90,32 @@ export const createCourse = (userId, courseData, callback) => {
         );
     });
 };
+
+// Deletes one course only when it belongs to the logged-in user.
+// Related activities are removed by the database through ON DELETE CASCADE.
+export const deleteCourseById = (courseId, userId, callback) => {
+    pool.getConnection((err, db) => {
+        if (err) {
+            console.error("Error getting database connection:", err);
+            return callback(err, null);
+        }
+
+        const query = `
+            DELETE FROM courses
+            WHERE course_id = ? AND user_id = ?
+        `;
+
+        db.query(query, [courseId, userId], (err, results) => {
+            db.release();
+
+            if (err) {
+                console.error("Error deleting course:", err);
+                return callback(err, null);
+            }
+
+            callback(null, {
+                affectedRows: results.affectedRows,
+            });
+        });
+    });
+};
