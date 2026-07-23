@@ -31,7 +31,7 @@ if (dbConnected) {
 initJWTSecret();
 const jwtSecret = getJWTSecret();
 if (jwtSecret) {
-    console.log("JWT secret is set." + jwtSecret);
+    console.log("JWT secret is set.");
 } else {
     console.error("JWT secret is not set.");
     process.exit(1);
