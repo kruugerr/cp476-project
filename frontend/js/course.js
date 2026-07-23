@@ -2,7 +2,7 @@
      courses.html        -> grid of every course (the sidebar link lands here)
      courses.html?id=N   -> detail view for that course */
 
-import { getCourses, getCourse } from "./api.js";
+import { deleteCourse, getCourses, getCourse } from "./api.js";
 import { requireAuth } from "./auth.js";
 import { courseCard, courseCardSkeleton } from "./components/courseCard.js";
 import { getParam, paramLink } from "./url.js";
@@ -204,6 +204,33 @@ async function renderDetail(id) {
   document.title = `${course.code || "Course"} · Trackr`;
 
   $("#courseHeader").innerHTML = headerHtml(course, raw);
+  const deleteButton = $("#deleteCourseBtn");
+  deleteButton.hidden = false;
+  deleteButton.disabled = false;
+  deleteButton.textContent = "Delete Course";
+
+  deleteButton.onclick = async () => {
+    const confirmed = confirm(
+      `Are you sure you want to delete ${course.code || "this course"}? ` +
+      "All assignments in this course will also be deleted. This cannot be undone.",
+    );
+
+    if (!confirmed) return;
+
+    deleteButton.disabled = true;
+    deleteButton.textContent = "Deleting...";
+
+    try {
+      await deleteCourse(course.id);
+      alert("Course deleted successfully.");
+      window.location.replace("courses.html");
+    } catch (error) {
+      console.error("Delete course failed:", error);
+      alert(error.message || "Could not delete the course. Please try again.");
+      deleteButton.disabled = false;
+      deleteButton.textContent = "Delete Course";
+    }
+  };
   $("#courseGrade").textContent =
     course.currentGrade == null ? "—" : course.currentGrade + "%";
   $("#courseBar").dataset.w = course.percentComplete;
