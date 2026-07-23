@@ -347,3 +347,35 @@ export const deleteCurrentUserAccount = (req, res) => {
         });
     });
 };
+
+// DELETE /user/courses/:courseId
+// Deletes a course only when it belongs to the authenticated user.
+export const deleteCourseById = (req, res) => {
+    const courseId = Number(req.params.courseId);
+
+    if (!Number.isInteger(courseId) || courseId <= 0) {
+        return res.status(400).json({
+            message: "Invalid course ID",
+        });
+    }
+
+    courseModel.deleteCourseById(
+        courseId,
+        req.user.user_id,
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    message: "Failed to delete course",
+                });
+            }
+
+            if (!result || result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
+            return res.status(204).end();
+        },
+    );
+};
