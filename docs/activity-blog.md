@@ -128,3 +128,64 @@ A task is done when it is completed, reviewed by a teammate, tested where applic
 - [x] Finalized main entities: Users, Courses, Activities, Enrollment, Activity Category
 - [ ] SQL table creation
 - [ ] ER diagram
+
+---
+
+### Back-End Integration Kickoff — July 8, 2026
+- 1 hour
+
+**Attendance:** Zach, Tyler, Zohra, Thanh, Win, Rafae
+
+**Discussion:**
+- Reviewed the finalized data model and started standing up the backend against MySQL
+- Converted `db.js` to work with MySQL and began wiring core models (Users, Courses, Activities)
+- Agreed on the API structure: routes, controllers, and models, split into auth, user, and admin groups
+- Discussed how the frontend (currently on mock data) would transition to real API calls page by page
+
+**Decisions Made:**
+- [x] Backend connected to MySQL; core models scaffolded
+- [x] Adopt a routes, controllers, and models structure
+- [x] Configure app security and a dedicated CORS middleware
+- [ ] Begin wiring authentication to the real API
+- [ ] Migrate student-facing pages off mock data
+
+---
+
+### Authentication & API Wiring Check-in — July 18, 2026
+- 1 hour
+
+**Attendance:** Zach, Win, Thanh, Ali, Zohra, Tyler
+
+**Discussion:**
+- Reviewed progress on connecting the frontend to the backend
+- Signup and login forms now validate and submit against the real API, with server-side validation and role forced to `student`
+- Google OAuth (login and signup) implemented, plus forgot/reset password flow
+- Calendar, GPA tracker, Settings, and Reminders wired to real API endpoints; Dashboard now reads real data
+- Syllabus upload connected to the extraction service so uploads populate courses and assignments
+
+**Decisions Made:**
+- [x] Auth flows (email/password, Google SSO, password reset) working end-to-end
+- [x] Core student pages migrated off mock data
+- [x] Syllabus upload, AI extraction, and dashboard pipeline connected
+- [ ] Finish admin dashboard on real data
+- [ ] Add backend test coverage before Milestone 3 review
+
+---
+
+### Admin, Testing & UI Polish — July 24, 2026
+- 1 hour
+
+**Attendance:** Full group
+
+**Discussion:**
+- Completed read-only admin API endpoints; Admin Dashboard now renders real data
+- Added account management — self-delete and admin "delete user by ID" — and confirmed Settings updates persist correctly
+- Rounded out the backend test suite (auth, user, admin, and security tests) with a shared test harness
+- Frontend cleanup pass: removed the notifications feature (topbar, settings, admin), removed the searchbar, fixed sidebar/topbar layout, made the calendar responsive, and standardized the dark/light toggle
+
+**Decisions Made:**
+- [x] Admin interface backed by real data
+- [x] Account deletion and settings persistence working
+- [x] Backend test suite in place
+- [x] Frontend cleanup and responsive fixes merged to main
+- [ ] Final Milestone 3 review and submission
